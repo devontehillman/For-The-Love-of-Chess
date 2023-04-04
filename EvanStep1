@@ -1,0 +1,104 @@
+from enum import Enum
+from abc import *
+
+
+class Color(Enum):
+    White = 1
+    Black = 2
+
+
+class Piece(ABC):
+    def __init__(self, Color):
+        image_path = #however you do the image path
+        _game = # doesn't say
+        self.color = Color
+        self._image = pygame.Surface((105, 105), pg.SRCALPHA)
+
+    def set_game(game):
+        if not isinstance(game, Game):
+            raise ValueError("You must provide a Valid Game instance.")
+        Piece._game = Game
+
+    @property
+    def color(self) -> Color:
+        return self._color
+
+    def set_image(self, x: int, y: int) -> None:
+        self._image.blit(Piece.SPRITESHEET, (0, 0), pygame.rect.Rect(x, y,
+        105, 105))
+
+    def _diagonal_moves(self, y: int, x: int, y_d: int, x_d: int, distance:int) -> List[Tuple[int, int]]:
+        moves = []
+        for i in range(1, distance):
+            row = y + (i * y_d)
+            col = x + (i * x_d)
+
+            if not self.valid_moves(row, col):
+                break
+            possible_piece = board[row][col]
+
+            if possible_piece is None:
+                moves.append((row, col))
+
+            elif possible_piece != self.color:
+                moves.append((row, col))
+                break
+
+            else:
+                break
+        return moves
+
+    def _horizontal_moves(self, y, x, y_d, x_d, distance):
+        moves = []
+        for i in range(1, distance):
+            left = x - (i * x_d)
+            right = x + (i * x_d)
+
+            if not self.valid_moves(left, right)
+                break
+
+            possible_piece = board[left][right]
+            if possible_piece is None:
+                moves.append((left, right))
+                break
+
+            elif possible_piece != self.color:
+                moves.append((left, right))
+                break
+
+            else:
+                break
+        return moves
+
+
+    def _vertical_moves(self, y, x, y_d, x_d, distance):
+        moves = []
+        for i range(1, distance):
+            up = y + (i * y_d)
+            down = y - (i * y_d)
+
+            if not self.valid_moves(up, down)
+                break
+
+            possible_piece = board[up][down]
+            if possible_piece is None:
+                moves.append((up, down))
+                break
+
+            elif possible_piece != self.color:
+                moves.append((up, down))
+                break
+
+            else:
+                break
+        return moves 
+
+
+
+
+
+
+
+
+
+
