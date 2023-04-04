@@ -13,6 +13,7 @@ class Piece(ABC):
         _game = # doesn't say
         self.color = Color
         self._image = pygame.Surface((105, 105), pg.SRCALPHA)
+        self.board = [[None for _ in range(9)] for _ in range(9)]
 
     def set_game(game):
         if not isinstance(game, Game):
@@ -35,7 +36,7 @@ class Piece(ABC):
 
             if not self.valid_moves(row, col):
                 break
-            possible_piece = board[row][col]
+            possible_piece = self.board[row][col]
 
             if possible_piece is None:
                 moves.append((row, col))
@@ -57,7 +58,7 @@ class Piece(ABC):
             if not self.valid_moves(left, right)
                 break
 
-            possible_piece = board[left][right]
+            possible_piece = self.board[left][right]
             if possible_piece is None:
                 moves.append((left, right))
                 break
@@ -80,7 +81,7 @@ class Piece(ABC):
             if not self.valid_moves(up, down)
                 break
 
-            possible_piece = board[up][down]
+            possible_piece = self.board[up][down]
             if possible_piece is None:
                 moves.append((up, down))
                 break
@@ -118,7 +119,7 @@ class Piece(ABC):
     def copy(self):
         pass
 
-    
 
-
-
+class King(Piece):
+    def __init__(self, Color):
+        self.color = Color
