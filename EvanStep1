@@ -1,5 +1,6 @@
 from enum import Enum
 from abc import *
+import copy
 
 
 class Color(Enum):
@@ -18,7 +19,7 @@ class Piece(ABC):
     def set_game(game):
         if not isinstance(game, Game):
             raise ValueError("You must provide a Valid Game instance.")
-        Piece._game = Game
+        Piece._game = game
 
     @property
     def color(self) -> Color:
@@ -122,4 +123,24 @@ class Piece(ABC):
 
 class King(Piece):
     def __init__(self, Color):
-        self.color = Color
+        super().__init__(Color)
+            self.color = Color
+
+        if Color == White:
+            self.set_image()
+
+        if Color == Black:
+            self.set_image()
+
+
+        def valid_moves(self, board, y, x):
+            moves = []
+            moves += board.get_horizontal_moves(y, x, 1)
+            moves += board.get_vertical_moves(y, x, 1)
+            moves += board.get_diagonal_moves(y, x, 1, [])
+
+            return moves
+
+
+        def copy(self):
+            return copy.deepcopy(self)  # is this how to deepcopy? this seems lazy and wrong
