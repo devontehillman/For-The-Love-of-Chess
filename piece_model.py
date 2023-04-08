@@ -36,7 +36,7 @@ class Piece(ABC):
         self._image.blit(Piece.SPRITESHEET, (0, 0), pygame.rect.Rect(x, y, 105, 105))
     
     def inbounds(x,y):
-        return (0 < y < 8) and (0 < x < 8)
+        return (0 <= y < 8) and (0 <= x < 8)
     
     def _diagonal_moves(self, y: int, x: int, y_d: int, x_d: int, distance:int) -> list[tuple[int, int]]:
         """
@@ -54,21 +54,23 @@ class Piece(ABC):
         Returns:
             List of possible positions the pice can move to
         """
+        row = y
+        col = x
         moves = []
     # For each step up until max distance
         for radius in range(0, distance):
             #Check spot at given radius 
-            y = y + y_d
-            x = x + x_d
-            position_to_check = position_to_check[x][y]
+            row = row + y_d
+            col = col + x_d
+            position_to_check = position_to_check[row][col]
             
             #Check if spot in bounds at given radius
-            if not Piece.inbounds(x,y):
+            if not Piece.inbounds(row,col):
                 return moves
             
             # No Piece at spot
-            if self.board[x][y] == None:
-                moves.append([x,y])
+            if self.board[row][col] == None:
+                moves.append([row,col])
                 continue
             
             #Theres a piece in spot check color
@@ -76,7 +78,7 @@ class Piece(ABC):
             if self.color == position_to_check.color:
                 exit
             else:
-                moves.append([x,y])
+                moves.append([row,col])
                 exit
             return moves
         
@@ -97,20 +99,21 @@ class Piece(ABC):
         starts at a particular spot on the board, and
         find all valid moves in a given horizontal direction.
         """
+        row = y
+        col = x
         moves = []
-    # For each step up until max distance
+        # For each step up until max distance
         for radius in range(0, distance):
             #Check spot at given radius 
-            y = y
-            x = x + x_d
-            position_to_check = position_to_check[y][x]
+            col = col + x_d
+            position_to_check = position_to_check[row][col]
             
             #Check if spot in bounds at given radius
-            if not Piece.inbounds(x,y):
+            if not Piece.inbounds(row,col):
                 return moves
             
             # No Piece at spot
-            if self.board[x][y] == None:
+            if self.board[row][col] == None:
                 moves.append([y,x])
                 continue
             
@@ -119,7 +122,7 @@ class Piece(ABC):
             if self.color == position_to_check.color:
                 exit
             else:
-                moves.append([y,x])
+                moves.append([row,col])
                 exit
             return moves
 
@@ -143,7 +146,33 @@ class Piece(ABC):
         Returns:
             all valid moves in a given vertical direction.
         """
-        pass
+        row = y
+        col = x
+        moves = []
+        # For each step up until max distance
+        for radius in range(0, distance):
+            #Check spot at given radius 
+            row = row + y_d
+            x = col
+            position_to_check = position_to_check[row][col]
+            
+            #Check if spot in bounds at given radius
+            if not Piece.inbounds(row,col):
+                return moves
+            
+            # No Piece at spot
+            if self.board[row][col] == None:
+                moves.append([row,col])
+                continue
+            
+            #Theres a piece in spot check color
+            #if same exit else add position and exit
+            if self.color == position_to_check.color:
+                exit
+            else:
+                moves.append([row,col])
+                exit
+            return moves
 
 
     def get_vertical_moves(self, y: int, x: int, distance: int) ->list[tuple[int, int]]:
