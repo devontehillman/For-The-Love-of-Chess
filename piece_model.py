@@ -97,7 +97,31 @@ class Piece(ABC):
         starts at a particular spot on the board, and
         find all valid moves in a given horizontal direction.
         """
-        pass
+        moves = []
+    # For each step up until max distance
+        for radius in range(0, distance):
+            #Check spot at given radius 
+            y = y
+            x = x + x_d
+            position_to_check = position_to_check[y][x]
+            
+            #Check if spot in bounds at given radius
+            if not Piece.inbounds(x,y):
+                return moves
+            
+            # No Piece at spot
+            if self.board[x][y] == None:
+                moves.append([y,x])
+                continue
+            
+            #Theres a piece in spot check color
+            #if same exit else add position and exit
+            if self.color == position_to_check.color:
+                exit
+            else:
+                moves.append([y,x])
+                exit
+            return moves
 
     def get_horizontal_moves(self, y: int, x: int, distance: int) ->list[tuple[int, int]]:
         """
@@ -105,7 +129,11 @@ class Piece(ABC):
         all possible directions.
 
         """
-        pass
+        #check right
+        moves = self._horizontal_moves(y, x, distance, 1)
+        #check left 
+        moves += self._horizontal_moves(y, x, distance, -1)
+        return moves
 
     def _vertical_moves(self, y: int, x: int, y_d: int, x_d: int, distance:int) -> list[tuple[int, int]]:
         """
