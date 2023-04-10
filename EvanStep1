@@ -253,3 +253,33 @@ class Pawn(Piece):
     def __init__(self, Color):
         super().__init__(Color)
         self.color = Color
+        self.first_move = False
+
+    if self.color == White:
+        self.set_image()
+
+    if self.color == Black:
+        self.set_image()
+
+
+    def valid_moves(self, y, x):
+        moves = []
+        if not self.first_move:
+            moves += super().get_vertical_moves(y, x, 2)
+            self.first_move = True
+
+        if self.first_move:
+            moves += super().get_vertical_moves(y, x, 1)
+
+        possible_piece_right = self._game.board[y+1][x+1]
+        if possible_piece_right != self.color and possible_piece_right is not None:
+            moves += possible_piece_right
+
+        possible_piece_left = self._game.board[y+1][x-1]
+        if possible_piece_left != self.color and possible_piece_left is not None:
+            moves += possible_piece_left
+
+        return moves
+    
+    def copy(self):
+        return copy.deepcopy(self)
