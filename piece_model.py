@@ -2,8 +2,8 @@ from enum import Enum
 from abc import ABC, abstractmethod
 
 def Color(Enum):
-    White = 0 
-    Black = 1
+    WHITE = 0 
+    BLACK = 1
 
 class Piece(ABC):
     """
@@ -133,7 +133,7 @@ class Piece(ABC):
 
         """
         #check right
-        moves = self._horizontal_moves(y, x, distance, 1)
+        moves += self._horizontal_moves(y, x, distance, 1)
         #check left 
         moves += self._horizontal_moves(y, x, distance, -1)
         return moves
@@ -179,9 +179,10 @@ class Piece(ABC):
         """
         These are convenience methods that simply call each of the previous methods for 
         all possible directions.
-
         """
-        pass
+        moves += self._vertical_moves(y, x, distance, 1)
+        moves += self._vertical_moves(y, x, distance, -1)
+        return moves
 
     @abstractmethod
     def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
@@ -198,3 +199,113 @@ class Piece(ABC):
         pieces)
         """
         pass
+
+class King(Piece):
+    def __init__(self, Color):
+        super.__init__(Color)
+        self.color = Color
+        
+        if Color == Color['WHITE']:
+            self.set_image(1,0)
+        
+        if Color == Color['BLACK']:
+            self.set_image(0,0)
+    
+    def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
+        moves = []
+        moves += super().get_horizontal_moves(y, x, 1)
+        moves += super().get_vertical_moves(y, x, 1)
+        moves += super().get_diagonal_moves(y, x, 1)
+
+        return moves
+    
+    def copied():
+        return King.color #is this what I am supposed to do?
+
+
+class Queen(Piece):
+    def __init__(self, Color):
+        super.__init__(Color)
+        self.color = Color
+
+        if Color == Color['WHITE']:
+            self.set_image(0,1)
+
+        if Color == Color['BLACK']:
+            self.set_image(1,1)
+    
+    def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
+        moves = []
+        moves += super().get_horizontal_moves(y, x, 8)
+        moves += super().get_vertical_moves(y, x, 8)
+        moves += super().get_diagonal_moves(y, x, 8)
+
+        return moves
+    
+    def copied():
+        return Queen.color #is this what I am supposed to do?
+    
+class Bishop(Piece):
+    def __init__(self, Color):
+        super.__init__(Color)
+        self.color = Color
+
+        if Color == Color['WHITE']:
+            self.set_image(0,1)
+
+        if Color == Color['BLACK']:
+            self.set_image(1,1)
+    
+    def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
+        moves = []
+        moves += super().get_diagonal_moves(y, x, 8)
+
+        return moves
+    
+    def copied():
+        return Bishop.color #is this what I am supposed to do?
+    
+class Knight(Piece):
+    pass
+
+class Rook(Piece):
+    def __init__(self, Color):
+        super.__init__(Color)
+        self.color = Color
+
+        if Color == Color['WHITE']:
+            self.set_image(0,1)
+
+        if Color == Color['BLACK']:
+            self.set_image(1,1)
+    
+    def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
+        moves = []
+        moves += super().get_horizontal_moves(y, x, 8)
+        moves += super().get_vertical_moves(y, x, 8)
+
+        return moves
+    
+    def copied():
+        return Rook.color #is this what I am supposed to do?
+    
+class Pawn(Piece):
+    def __init__(self, Color):
+        super.__init__(Color)
+        self.color = Color
+
+        if Color == Color['WHITE']:
+            self.set_image(0,1)
+
+        if Color == Color['BLACK']:
+            self.set_image(1,1)
+    
+    def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
+        moves = []
+        moves += super().get_horizontal_moves(y, x, 1)
+        
+
+        return moves
+    
+    def copied():
+        return Pawn.color #is this what I am supposed to do?
