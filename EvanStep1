@@ -1,6 +1,7 @@
 from enum import Enum
 from abc import *
 import copy
+from game import *
 
 
 class Color(Enum):
@@ -9,12 +10,11 @@ class Color(Enum):
 
 
 class Piece(ABC):
-    _game =  # doesn't say
+    _game =  Game
     def __init__(self, Color):
         image_path = #however you do the image path
         self.color = Color
         self._image = pygame.Surface((105, 105), pg.SRCALPHA)
-        self.board = [[None for _ in range(9)] for _ in range(9)]
 
     def set_game(game):
         if not isinstance(game, Game):
@@ -38,7 +38,7 @@ class Piece(ABC):
             if not self.valid_moves(row, col):
                 break
 
-            possible_piece = self.board[row][col]
+            possible_piece = self._game.board[row][col]
 
             if possible_piece is None:
                 moves.append((row, col))
@@ -60,7 +60,7 @@ class Piece(ABC):
             if not self.valid_moves(left, right)
                 break
 
-            possible_piece = self.board[left][right]
+            possible_piece = self._game.board[left][right]
 
             if possible_piece is None:
                 moves.append((left, right))
@@ -84,7 +84,7 @@ class Piece(ABC):
             if not self.valid_moves(up, down)
                 break
 
-            possible_piece = self.board[up][down]
+            possible_piece = self._game.board[up][down]
 
             if possible_piece is None:
                 moves.append((up, down))
@@ -213,7 +213,12 @@ class Knight(Piece):
         def valid_moves(self, y, x):
             moves = []
             possible_moves = [(y+2, x+1), (y+2, x-1), (y+1, x+2), (y+1, x-2),
-                              (y)]
+                              (y-2, x+1), (y-2, x-1), (y-1, x+2), (y-1, x-2)]
+            for move in possible_moves:
+                if 0 <= move[0] <= 8 and 0 <= move[1] <= 8:
+                    if self._game.board[move[0]][move[1]] != self.color:
+                        moves.append(move)
+
             return moves
 
 
