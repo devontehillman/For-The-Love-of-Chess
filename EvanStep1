@@ -129,7 +129,7 @@ class Piece(ABC):
 class King(Piece):
     def __init__(self, Color):
         super().__init__(Color)
-            self.color = Color
+        self.color = Color
 
         if self.color == White:
             self.set_image()
@@ -138,22 +138,22 @@ class King(Piece):
             self.set_image()
 
 
-        def valid_moves(self, y, x):
-            moves = []
-            moves += board.get_horizontal_moves(y, x, 1)
-            moves += board.get_vertical_moves(y, x, 1)
-            moves += board.get_diagonal_moves(y, x, 1, [])
+    def valid_moves(self, y, x):
+        moves = []
+        moves += super().get_horizontal_moves(y, x, 1)
+        moves += super().get_vertical_moves(y, x, 1)
+        moves += super().get_diagonal_moves(y, x, 1, [])
 
-            return moves
+        return moves
 
 
-        def copy(self):
-            return copy.deepcopy(self)  # is this how to deepcopy? this seems lazy and wrong
+    def copy(self):
+        return copy.deepcopy(self)  # is this how to deepcopy? this seems lazy and wrong
 
 class Queen(Piece):
     def __init__(self, Color):
         super().__init__(Color)
-            self.color = Color
+        self.color = Color
 
         if self.color == White:
             self.set_image()
@@ -162,23 +162,23 @@ class Queen(Piece):
             self.set_image()
 
 
-        def valid_moves(self, y, x):
-            moves = []
-            moves += board.get_horizontal_moves(y, x, 8)
-            moves += board.get_vertical_moves(y, x, 8)
-            moves += board.get_diagonal_moves(y, x, 8, [])
+    def valid_moves(self, y, x):
+        moves = []
+        moves += super().get_horizontal_moves(y, x, 8)
+        moves += super().get_vertical_moves(y, x, 8)
+        moves += super().get_diagonal_moves(y, x, 8, [])
 
-            return moves
+        return moves
 
 
-        def copy(self):
-            return copy.deepcopy(self)  # is this how to deepcopy? this seems lazy and wrong
+    def copy(self):
+        return copy.deepcopy(self)  # is this how to deepcopy? this seems lazy and wrong
 
 
 class Bishop(Piece):
     def __init__(self, Color):
         super().__init__(Color)
-            self.color = Color
+        self.color = Color
 
         if self.color == White:
             self.set_image()
@@ -187,20 +187,20 @@ class Bishop(Piece):
             self.set_image()
 
 
-        def valid_moves(self, y, x):
-            moves = []
-            moves += board.get_diagonal_moves(y, x, 8, [])
-            return moves
+    def valid_moves(self, y, x):
+        moves = []
+        moves += super().get_diagonal_moves(y, x, 8, [])
+        return moves
 
 
-        def copy(self):
-            return copy.deepcopy(self)  # is this how to deepcopy? this seems lazy and wrong
+    def copy(self):
+        return copy.deepcopy(self)  # is this how to deepcopy? this seems lazy and wrong
 
 
 class Knight(Piece):
     def __init__(self, Color):
         super().__init__(Color)
-            self.color = Color
+        self.color = Color
 
         if self.color == White:
             self.set_image()
@@ -210,26 +210,26 @@ class Knight(Piece):
 
 
 
-        def valid_moves(self, y, x):
-            moves = []
-            possible_moves = [(y+2, x+1), (y+2, x-1), (y+1, x+2), (y+1, x-2),
-                              (y-2, x+1), (y-2, x-1), (y-1, x+2), (y-1, x-2)]
-            for move in possible_moves:
-                if 0 <= move[0] <= 8 and 0 <= move[1] <= 8:
-                    if self._game.board[move[0]][move[1]] != self.color:
-                        moves.append(move)
+    def valid_moves(self, y, x):
+        moves = []
+        possible_moves = [(y+2, x+1), (y+2, x-1), (y+1, x+2), (y+1, x-2),
+                          (y-2, x+1), (y-2, x-1), (y-1, x+2), (y-1, x-2)]
+        for move in possible_moves:
+            if 0 <= move[0] <= 8 and 0 <= move[1] <= 8:
+                if self._game.board[move[0]][move[1]] != self.color:
+                    moves.append(move)
 
-            return moves
+        return moves
 
 
-        def copy(self):
-            return copy.deepcopy(self)  # is this how to deepcopy? this seems lazy and wrong
+    def copy(self):
+        return copy.deepcopy(self)  # is this how to deepcopy? this seems lazy and wrong
 
 
 class Rook(Piece):
     def __init__(self, Color):
         super().__init__(Color)
-            self.color = Color
+        self.color = Color
 
         if self.color == White:
             self.set_image()
@@ -238,15 +238,18 @@ class Rook(Piece):
             self.set_image()
 
 
-        def valid_moves(self, y, x):
-            moves = []
-            moves += board.get_horizontal_moves(y, x, 8)
-            moves += board.get_vertical_moves(y, x, 8)
-            return moves
+    def valid_moves(self, y, x):
+        moves = []
+        moves += super().get_horizontal_moves(y, x, 8)
+        moves += super().get_vertical_moves(y, x, 8)
+        return moves
 
 
-        def copy(self):
-            return copy.deepcopy(self)  # is this how to deepcopy? this seems lazy
+    def copy(self):
+        return copy.deepcopy(self)  # is this how to deepcopy? this seems lazy
 
 
 class Pawn(Piece):
+    def __init__(self, Color):
+        super().__init__(Color)
+        self.color = Color
