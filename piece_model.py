@@ -1,7 +1,7 @@
 from enum import Enum 
 from abc import ABC, abstractmethod
 
-def Color(Enum):
+class Color(Enum):
     WHITE = 0 
     BLACK = 1
 
@@ -18,7 +18,7 @@ class Piece(ABC):
     def __init__(self, Color: Enum ):
         self.color = Color
         self._image = pygame.Surface((105, 105), pg.SRCALPHA)
-    
+
     @property
     def color(self):
         return self._color
@@ -266,7 +266,26 @@ class Bishop(Piece):
         return Bishop.color #is this what I am supposed to do?
     
 class Knight(Piece):
-    pass
+    def __init__(self, Color):
+        super().__init__(Color)
+        self.color = Color
+
+        if self.color == White:
+            self.set_image(0,3)
+
+        if self.color == Black:
+            self.set_image(1,3)
+
+    def valid_moves(self, y, x):
+        moves = []
+        possible_moves = [(y+2, x+1), (y+2, x-1), (y+1, x+2), (y+1, x-2),
+                            (y-2, x+1), (y-2, x-1), (y-1, x+2), (y-1, x-2)]
+        for move in possible_moves:
+            if 0 <= move[0] <= 8 and 0 <= move[1] <= 8:
+                if self._game.board[move[0]][move[1]] != self.color:
+                    moves.append(move)
+
+        return movespass
 
 class Rook(Piece):
     def __init__(self, Color):
@@ -299,13 +318,25 @@ class Pawn(Piece):
 
         if Color == Color['BLACK']:
             self.set_image(1,1)
-    
-    def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
+
+    def valid_moves(self, y, x):
         moves = []
-        moves += super().get_horizontal_moves(y, x, 1)
-        
+        if not self.first_move:
+            moves += super().get_vertical_moves(y, x, 2)
+            self.first_move = True
+
+        if self.first_move:
+            moves += super().get_vertical_moves(y, x, 1)
+
+        possible_piece_right = self._game.board[y+1][x+1]
+        if possible_piece_right != self.color and possible_piece_right is not None:
+            moves += possible_piece_right
+
+        possible_piece_left = self._game.board[y+1][x-1]
+        if possible_piece_left != self.color and possible_piece_left is not None:
+            moves += possible_piece_left
 
         return moves
     
-    def copied():
-        return Pawn.color #is this what I am supposed to do?
+    def copy(self):
+        return copy.deepcopy(self)
