@@ -70,10 +70,6 @@ class Game():
 
 
 
-
-
-
-
     def get(self, y:int, int):
         """
         Returns the piece at the given position or None if no piece exist
@@ -84,7 +80,10 @@ class Game():
         """
         Switches current player to opposing player
         """
-        pass
+        if self.Color == Color['WHITE']:
+            self.Color = Color['BLACK']
+        else:
+            self.Color = Color['WHITE']
 
     def undo(self):
         """
@@ -100,6 +99,7 @@ class Game():
         Copying a board must be a deep copy - not a shallow copy. 
         """
         pass
+    
     def move(self, piece: Piece, y: int, x: int, y2: int, x2: int) -> bool:
         """
         copy the board into the prior states stack then perform the move by setting 
