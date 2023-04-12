@@ -28,8 +28,8 @@ class Game():
         setup the board and determine the current player
         """
         self._board = [[None for _ in range(8)] for _ in range(8)]
-        self.current_player = Color.BLACK
-    
+        self.current_player = Color.WHITE
+        self._setup_pieces()
 
     
         
@@ -42,39 +42,40 @@ class Game():
         """
         Initializes board by starting all pieces in their correct positions
         """
-        self.board[0][0] = Rook(Color['BLACK'])
-        self.board[0][1] = Knight(Color['BLACK'])
-        self.board[0][2] = Bishop(Color['BLACK'])
-        self.board[0][3] = Queen(Color['BLACK'])
-        self.board[0][4] = King(Color['BLACK'])
-        self.board[0][5] = Bishop(Color['BLACK'])
-        self.board[0][6] = Knight(Color['BLACK'])
-        self.board[0][7] = Rook(Color['BLACK'])
+        self._board[0][0] = Rook(Color['BLACK'])
+        self._board[0][1] = Knight(Color['BLACK'])
+        self._board[0][2] = Bishop(Color['BLACK'])
+        self._board[0][3] = Queen(Color['BLACK'])
+        self._board[0][4] = King(Color['BLACK'])
+        self._board[0][5] = Bishop(Color['BLACK'])
+        self._board[0][6] = Knight(Color['BLACK'])
+        self._board[0][7] = Rook(Color['BLACK'])
         
         
-        for i in range(9):
-            self.board[1][i] = Pawn(Color['BLACK'])
+        for i in range(8):
+            self._board[1][i] = Pawn(Color['BLACK'])
         
-        self.board[7][0] = Rook(Color['WHITE'])
-        self.board[7][1] = Knight(Color['WHITE'])
-        self.board[7][2] = Bishop(Color['WHITE'])
-        self.board[7][4] = Queen(Color['WHITE'])
-        self.board[7][3] = King(Color['WHITE'])
-        self.board[7][5] = Bishop(Color['WHITE'])
-        self.board[7][6] = Knight(Color['WHITE'])
-        self.board[7][7] = Rook(Color['WHITE'])
+        self._board[7][0] = Rook(Color['WHITE'])
+        self._board[7][1] = Knight(Color['WHITE'])
+        self._board[7][2] = Bishop(Color['WHITE'])
+        self._board[7][4] = Queen(Color['WHITE'])
+        self._board[7][3] = King(Color['WHITE'])
+        self._board[7][5] = Bishop(Color['WHITE'])
+        self._board[7][6] = Knight(Color['WHITE'])
+        self._board[7][7] = Rook(Color['WHITE'])
         
         
-        for i in range(9):
-            self.board[6][i] = Pawn(Color['White'])
+        for i in range(8):
+            self._board[6][i] = Pawn(Color['WHITE'])
 
 
 
-    def get(self, y:int, int):
+    def get(self, y:int, x:int):
         """
         Returns the piece at the given position or None if no piece exist
+        Responsible for displaying pieces to board
         """
-        pass
+        return self._board[y][x]
 
     def switch_player(self):
         """
@@ -88,7 +89,7 @@ class Game():
     def undo(self):
         """
         Pops the last board state from the stack and set the current board to it
-        Return true if this can be done and flase if there is no prior state
+        Return true if this can be done and false if there is no prior state
         """
         pass
 
@@ -99,7 +100,7 @@ class Game():
         Copying a board must be a deep copy - not a shallow copy. 
         """
         pass
-    
+
     def move(self, piece: Piece, y: int, x: int, y2: int, x2: int) -> bool:
         """
         copy the board into the prior states stack then perform the move by setting 
@@ -129,7 +130,7 @@ class Game():
         """
         This will find the position of the King  of the given color.
         """
-        pass
+        _
 
     def check(self, color: Color) -> bool:
         """
