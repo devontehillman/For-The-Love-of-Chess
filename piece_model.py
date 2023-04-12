@@ -1,5 +1,6 @@
 from enum import Enum 
 from abc import ABC, abstractmethod
+import pygame 
 
 class Color(Enum):
     WHITE = 0 
@@ -12,28 +13,34 @@ class Piece(ABC):
         _game:list? Stores board? in order for the piece to keep track of the game.
         image:str Holds path to the image file
     """
-    _game  = None
-    image = "./images/pieces.png"
+    _game  = []
+    SPRITESHEET =  pygame.image.load("./images/pieces.png")
 
-    def __init__(self, Color: Enum ):
-        self.color = Color
-        self._image = pygame.Surface((105, 105), pg.SRCALPHA)
+    def __init__(self, color: Color):
+        self._color = color
+        self._image = pygame.Surface((105, 105), pygame.SRCALPHA)
+        
 
     @property
     def color(self):
         return self._color
+    
+    #Should I delete?
+    @color.setter
+    def color(self, val):
+        self.color == val
     
     def set_game(game):    
         if not isinstance(game, Game):        
             raise ValueError("You must provide a valid Game instance.")    
         Piece._game = game
 
-    def set_image(self, x: int, y: int) -> None:
+    def set_image(self, y: int, x: int) -> None:
         """
         This code will take an x  and y  value and copy from our image file 
         a 105x105 pixel chunk into the current piece's image
         """
-        self._image.blit(Piece.SPRITESHEET, (0, 0), pygame.rect.Rect(x, y, 105, 105))
+        self._image.blit(Piece.SPRITESHEET, (0,0), pygame.rect.Rect(y*105, x*105, 105, 105))
     
     def inbounds(x,y):
         return (0 <= y < 8) and (0 <= x < 8)
@@ -201,15 +208,15 @@ class Piece(ABC):
         pass
 
 class King(Piece):
-    def __init__(self, Color):
-        super.__init__(Color)
-        self.color = Color
+    def __init__(self, color):
+        super().__init__(color)
+        self.color = color
         
-        if Color == Color['WHITE']:
-            self.set_image(1,0)
-        
-        if Color == Color['BLACK']:
+        if self.color == Color['WHITE']:
             self.set_image(0,0)
+        
+        if self.color == Color['BLACK']:
+            self.set_image(0,1)
     
     def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
         moves = []
@@ -224,14 +231,14 @@ class King(Piece):
 
 
 class Queen(Piece):
-    def __init__(self, Color):
-        super.__init__(Color)
-        self.color = Color
+    def __init__(self, color):
+        super().__init__(color)
+        self.color = color
 
-        if Color == Color['WHITE']:
-            self.set_image(0,1)
+        if self.color == Color['WHITE']:
+            self.set_image(1,0)
 
-        if Color == Color['BLACK']:
+        if self.color == Color['BLACK']:
             self.set_image(1,1)
     
     def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
@@ -246,15 +253,15 @@ class Queen(Piece):
         return Queen.color #is this what I am supposed to do?
     
 class Bishop(Piece):
-    def __init__(self, Color):
-        super.__init__(Color)
-        self.color = Color
+    def __init__(self, color):
+        super().__init__(color)
+        self.color = color
 
-        if Color == Color['WHITE']:
-            self.set_image(0,1)
+        if self.color == Color['WHITE']:
+            self.set_image(2,0)
 
-        if Color == Color['BLACK']:
-            self.set_image(1,1)
+        if self.color == Color['BLACK']:
+            self.set_image(2,1)
     
     def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
         moves = []
@@ -266,15 +273,15 @@ class Bishop(Piece):
         return Bishop.color #is this what I am supposed to do?
     
 class Knight(Piece):
-    def __init__(self, Color):
-        super().__init__(Color)
-        self.color = Color
+    def __init__(self, color):
+        super().__init__(color)
+        self.color = color
 
-        if self.color == White:
-            self.set_image(0,3)
+        if self.color == Color['WHITE']:
+            self.set_image(3,0)
 
-        if self.color == Black:
-            self.set_image(1,3)
+        if self.color == Color['BLACK']:
+            self.set_image(3,1)
 
     def valid_moves(self, y, x):
         moves = []
@@ -288,15 +295,15 @@ class Knight(Piece):
         return movespass
 
 class Rook(Piece):
-    def __init__(self, Color):
-        super.__init__(Color)
-        self.color = Color
+    def __init__(self, color):
+        super().__init__(color)
+        self.color = color
 
-        if Color == Color['WHITE']:
-            self.set_image(0,1)
+        if self.color == Color['WHITE']:
+            self.set_image(4,0)
 
-        if Color == Color['BLACK']:
-            self.set_image(1,1)
+        if self.color == Color['BLACK']:
+            self.set_image(4,1)
     
     def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
         moves = []
@@ -309,15 +316,15 @@ class Rook(Piece):
         return Rook.color #is this what I am supposed to do?
     
 class Pawn(Piece):
-    def __init__(self, Color):
-        super.__init__(Color)
-        self.color = Color
+    def __init__(self, color):
+        super().__init__(color)
+        self.color = color
 
-        if Color == Color['WHITE']:
-            self.set_image(0,1)
+        if self.color == Color['WHITE']:
+            self.set_image(5,0)
 
-        if Color == Color['BLACK']:
-            self.set_image(1,1)
+        if self.color == Color['BLACK']:
+            self.set_image(5,1)
 
     def valid_moves(self, y, x):
         moves = []
