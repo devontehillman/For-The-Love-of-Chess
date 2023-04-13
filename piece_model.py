@@ -1,6 +1,7 @@
 from enum import Enum 
 from abc import ABC, abstractmethod
 import pygame 
+import copy
 
 class Color(Enum):
     WHITE = 0 
@@ -16,10 +17,10 @@ class Piece(ABC):
     _game  = []
     SPRITESHEET =  pygame.image.load("./images/pieces.png")
 
-    def __init__(self, color: Color):
+    def __init__(self, color: Color, board):
         self._color = color
         self._image = pygame.Surface((105, 105), pygame.SRCALPHA)
-        
+        self._board = board
 
     @property
     def color(self):
@@ -69,15 +70,16 @@ class Piece(ABC):
             #Check spot at given radius 
             row = row + y_d
             col = col + x_d
-            position_to_check = position_to_check[row][col]
             
             #Check if spot in bounds at given radius
             if not Piece.inbounds(row,col):
                 return moves
             
+            position_to_check = self.board[row][col]
+            
             # No Piece at spot
             if self.board[row][col] == None:
-                moves.append([row,col])
+                moves.append((row,col))
                 continue
             
             #Theres a piece in spot check color
@@ -85,20 +87,24 @@ class Piece(ABC):
             if self.color == position_to_check.color:
                 exit
             else:
-                moves.append([row,col])
+                moves.append((row,col))
                 exit
-            return moves
-        
+        return moves
 
-    def get_diagonal_moves(self, y: int, x: int, distance: int, moves) ->list[tuple[int, int]]:
+    def get_diagonal_moves(self, y: int, x: int, distance: int) ->list[tuple[int, int]]:
         """
         These are convenience methods that simply call each directional method for all
         possible directions. 
         """
-        moves += self._diagonal_moves(y, x, distance, 1, 1)
-        moves += self._diagonal_moves(y, x, distance, -1, 1)
-        moves += self._diagonal_moves(y, x, distance, 1, -1)
-        moves += self._diagonal_moves(y, x, distance, -1, -1)
+        moves = []
+        # Down to the right 
+        moves += self._diagonal_moves(y, x, 1, 1, distance)
+        #Up to the right
+        moves += self._diagonal_moves(y, x, -1, 1, distance)
+        #Down to the left
+        moves += self._diagonal_moves(y, x, 1, -1, distance)
+        #Up to the left 
+        moves += self._diagonal_moves(y, x, -1, -1, distance)
         return moves
     
     def _horizontal_moves(self, y: int, x: int, y_d: int, x_d: int, distance:int) -> list[tuple[int, int]]:
@@ -113,15 +119,15 @@ class Piece(ABC):
         for radius in range(0, distance):
             #Check spot at given radius 
             col = col + x_d
-            position_to_check = position_to_check[row][col]
             
             #Check if spot in bounds at given radius
             if not Piece.inbounds(row,col):
                 return moves
             
+            position_to_check = self.board[row][col]
             # No Piece at spot
             if self.board[row][col] == None:
-                moves.append([y,x])
+                moves.append((row,col))
                 continue
             
             #Theres a piece in spot check color
@@ -129,7 +135,7 @@ class Piece(ABC):
             if self.color == position_to_check.color:
                 exit
             else:
-                moves.append([row,col])
+                moves.append((row,col))
                 exit
             return moves
 
@@ -139,10 +145,11 @@ class Piece(ABC):
         all possible directions.
 
         """
+        moves = []
         #check right
-        moves += self._horizontal_moves(y, x, distance, 1)
+        moves += self._horizontal_moves(y, x, 0, 1, distance)
         #check left 
-        moves += self._horizontal_moves(y, x, distance, -1)
+        moves += self._horizontal_moves(y, x, 0, -1, distance)
         return moves
 
     def _vertical_moves(self, y: int, x: int, y_d: int, x_d: int, distance:int) -> list[tuple[int, int]]:
@@ -161,15 +168,16 @@ class Piece(ABC):
             #Check spot at given radius 
             row = row + y_d
             x = col
-            position_to_check = position_to_check[row][col]
             
             #Check if spot in bounds at given radius
             if not Piece.inbounds(row,col):
                 return moves
             
+            position_to_check = self._board[row][col]
+            
             # No Piece at spot
-            if self.board[row][col] == None:
-                moves.append([row,col])
+            if self._board[row][col] == None:
+                moves.append((row,col))
                 continue
             
             #Theres a piece in spot check color
@@ -177,18 +185,20 @@ class Piece(ABC):
             if self.color == position_to_check.color:
                 exit
             else:
-                moves.append([row,col])
+                moves.append((row,col))
                 exit
-            return moves
-
+        return moves
 
     def get_vertical_moves(self, y: int, x: int, distance: int) ->list[tuple[int, int]]:
         """
         These are convenience methods that simply call each of the previous methods for 
         all possible directions.
         """
-        moves += self._vertical_moves(y, x, distance, 1)
-        moves += self._vertical_moves(y, x, distance, -1)
+        moves = []
+        # check down 
+        moves += self._vertical_moves(y, x, 1, 0, distance)
+        # check up
+        moves += self._vertical_moves(y, x, -1, 0, distance)
         return moves
 
     @abstractmethod
@@ -208,10 +218,11 @@ class Piece(ABC):
         pass
 
 class King(Piece):
-    def __init__(self, color):
-        super().__init__(color)
+    def __init__(self, color, board):
+        super().__init__(color, board)
         self.color = color
-        
+        self.board = board
+
         if self.color == Color['WHITE']:
             self.set_image(0,0)
         
@@ -219,21 +230,21 @@ class King(Piece):
             self.set_image(0,1)
     
     def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
-        moves = []
+        moves = [(y,x)]
         moves += super().get_horizontal_moves(y, x, 1)
         moves += super().get_vertical_moves(y, x, 1)
         moves += super().get_diagonal_moves(y, x, 1)
 
         return moves
     
-    def copied():
-        return King.color #is this what I am supposed to do?
-
+    def copied(self):
+        return copy.deepcopy(self) #is this what I am supposed to do?
 
 class Queen(Piece):
-    def __init__(self, color):
-        super().__init__(color)
+    def __init__(self, color, board):
+        super().__init__(color, board)
         self.color = color
+        self.board = board
 
         if self.color == Color['WHITE']:
             self.set_image(1,0)
@@ -242,7 +253,7 @@ class Queen(Piece):
             self.set_image(1,1)
     
     def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
-        moves = []
+        moves = [(y,x)]
         moves += super().get_horizontal_moves(y, x, 8)
         moves += super().get_vertical_moves(y, x, 8)
         moves += super().get_diagonal_moves(y, x, 8)
@@ -250,12 +261,13 @@ class Queen(Piece):
         return moves
     
     def copied():
-        return Queen.color #is this what I am supposed to do?
+        return copy.deepcopy(self) #is this what I am supposed to do?
     
 class Bishop(Piece):
-    def __init__(self, color):
-        super().__init__(color)
+    def __init__(self, color, board):
+        super().__init__(color, board)
         self.color = color
+        self.board = board
 
         if self.color == Color['WHITE']:
             self.set_image(2,0)
@@ -264,18 +276,19 @@ class Bishop(Piece):
             self.set_image(2,1)
     
     def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
-        moves = []
+        moves = [(y,x)]
         moves += super().get_diagonal_moves(y, x, 8)
 
         return moves
     
-    def copied():
-        return Bishop.color #is this what I am supposed to do?
+    def copied(self):
+        return copy.deepcopy(self) #is this what I am supposed to do?
     
 class Knight(Piece):
-    def __init__(self, color):
-        super().__init__(color)
+    def __init__(self, color, board):
+        super().__init__(color, board)
         self.color = color
+        self.board = board
 
         if self.color == Color['WHITE']:
             self.set_image(3,0)
@@ -284,20 +297,24 @@ class Knight(Piece):
             self.set_image(3,1)
 
     def valid_moves(self, y, x):
-        moves = []
+        moves = [(y,x)]
         possible_moves = [(y+2, x+1), (y+2, x-1), (y+1, x+2), (y+1, x-2),
                             (y-2, x+1), (y-2, x-1), (y-1, x+2), (y-1, x-2)]
         for move in possible_moves:
             if 0 <= move[0] <= 8 and 0 <= move[1] <= 8:
-                if self._game.board[move[0]][move[1]] != self.color:
+                if self.board[move[0]][move[1]] != self.color:
                     moves.append(move)
 
-        return movespass
+        return moves
+    
+    def copied(self):
+        return copy.deepcopy(self) #is this what I am supposed to do?
 
 class Rook(Piece):
-    def __init__(self, color):
-        super().__init__(color)
+    def __init__(self, color, board):
+        super().__init__(color, board)
         self.color = color
+        self.board = board
 
         if self.color == Color['WHITE']:
             self.set_image(4,0)
@@ -306,19 +323,21 @@ class Rook(Piece):
             self.set_image(4,1)
     
     def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
-        moves = []
+        moves = [(y,x)]
         moves += super().get_horizontal_moves(y, x, 8)
         moves += super().get_vertical_moves(y, x, 8)
 
         return moves
     
     def copied():
-        return Rook.color #is this what I am supposed to do?
+        return copy.deepcopy(self) #is this what I am supposed to do?
     
 class Pawn(Piece):
-    def __init__(self, color):
-        super().__init__(color)
+    def __init__(self, color, board):
+        super().__init__(color, board)
         self.color = color
+        self.first_move = True
+        self.board = board
 
         if self.color == Color['WHITE']:
             self.set_image(5,0)
@@ -327,7 +346,7 @@ class Pawn(Piece):
             self.set_image(5,1)
 
     def valid_moves(self, y, x):
-        moves = []
+        moves = [(y,x)]
         if not self.first_move:
             moves += super().get_vertical_moves(y, x, 2)
             self.first_move = True
@@ -335,11 +354,11 @@ class Pawn(Piece):
         if self.first_move:
             moves += super().get_vertical_moves(y, x, 1)
 
-        possible_piece_right = self._game.board[y+1][x+1]
+        possible_piece_right = self.board[y+1][x+1]
         if possible_piece_right != self.color and possible_piece_right is not None:
             moves += possible_piece_right
 
-        possible_piece_left = self._game.board[y+1][x-1]
+        possible_piece_left = self.board[y+1][x-1]
         if possible_piece_left != self.color and possible_piece_left is not None:
             moves += possible_piece_left
 
