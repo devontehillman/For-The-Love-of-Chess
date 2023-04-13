@@ -143,18 +143,28 @@ class Game():
         """
         This will find the position of the King  of the given color.
         """
-        _
+
+        for y in self._board:
+            for x in y:
+                piece = self.board[y][x]
+                if isinstance(piece, King) and piece.color == color:
+                    location = (y, x)
+
+        return location
 
     def check(self, color: Color) -> bool:
         """
         This method will get locations of the opposing pieces (use the method above).
         It will then iterate over each of those pieces, calling their valid_moves  method,
         and adding all valid moves for all pieces to a list of possible moves. The
-        method should then get the position of the king. If the positionof the king is in
+        method should then get the position of the king. If the position of the king is in
         the list of possible moves, the king is in check. Return True  in this case,
         and False  otherwise.
         """
-        pass
+        locations = self.get_piece_locations(color)
+        possible_moves = []
+        for piece in locations:
+
 
     def _computer_move(self):
         """
