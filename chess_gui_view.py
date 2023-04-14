@@ -62,9 +62,9 @@ class GUI:
                             self._side_box.append_html_text("WHITE is in CHECK!<br />")
                         if self._game.check(Color.BLACK):
                             self._side_box.append_html_text("BLACK is in CHECK!<br />")
-                        if self._game.mate(Color.WHITE):
+                        if self._game.check(Color.WHITE):
                             self._side_box.append_html_text("WHITE is in CHECKMATE!<br />GAME OVER!")
-                        if self._game.mate(Color.BLACK):
+                        if self._game.check(Color.BLACK):
                             self._side_box.append_html_text("BLACK is in CHECKMATE!<br />GAME OVER!")
 
                         self._piece_selected = False
