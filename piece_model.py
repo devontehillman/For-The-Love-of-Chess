@@ -209,7 +209,7 @@ class Piece(ABC):
         """
         pass
     
-    def copied(self):
+    def copy(self):
         """
         This function will copy a piece. We will use this to simulate
         possible moves for the computer, by copying the state of the board (and thus the
@@ -237,7 +237,7 @@ class King(Piece):
 
         return moves
     
-    def copied(self):
+    def copy(self):
         return copy.deepcopy(self) #is this what I am supposed to do?
 
 class Queen(Piece):
@@ -260,7 +260,7 @@ class Queen(Piece):
 
         return moves
     
-    def copied():
+    def copy():
         return copy.deepcopy(self) #is this what I am supposed to do?
     
 class Bishop(Piece):
@@ -281,7 +281,7 @@ class Bishop(Piece):
 
         return moves
     
-    def copied(self):
+    def copy(self):
         return copy.deepcopy(self) #is this what I am supposed to do?
     
 class Knight(Piece):
@@ -307,7 +307,7 @@ class Knight(Piece):
 
         return moves
     
-    def copied(self):
+    def copy(self):
         return copy.deepcopy(self) #is this what I am supposed to do?
 
 class Rook(Piece):
@@ -329,14 +329,14 @@ class Rook(Piece):
 
         return moves
     
-    def copied():
+    def copy():
         return copy.deepcopy(self) #is this what I am supposed to do?
     
 class Pawn(Piece):
     def __init__(self, color, board):
         super().__init__(color, board)
         self.color = color
-        self.first_move = False
+        self.first_move = True
         self.board = board
 
         if self.color == Color['WHITE']:
@@ -347,11 +347,11 @@ class Pawn(Piece):
 
     def valid_moves(self, y, x):
         moves = [(y,x)]
-        if not self.first_move:
-            moves += super().get_vertical_moves(y, x, 2)
-            self.first_move = True
-
         if self.first_move:
+            moves += super().get_vertical_moves(y, x, 2)
+            self.first_move = False
+
+        if not self.first_move:
             moves += super().get_vertical_moves(y, x, 1)
 
         if x + 1 >= 8 and y + 1 >= 8:
