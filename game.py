@@ -211,4 +211,16 @@ class Game():
         computer player. In the next phase, you will create a more robust method for picking
         computer moves.
         """
-        pass
+        color = Color['Black']
+        locations = self.get_piece_locations(color)
+        location = random.choice(locations)
+        piece = self.get(location[0], location[1])
+        moves = piece.valid_moves(location[0], location[1])
+        move = random.choice(moves)
+        
+        if self.move(piece, location[0], location[1], move[0], move[1]):
+            return
+
+        else:
+            self.undo()
+            self._computer_move()
