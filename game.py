@@ -173,7 +173,7 @@ class Game():
                 if isinstance(piece, King) and piece._color == color:
                         return (row_num, col)
                 col += 1 
-            rownum += 1
+            row_num += 1
             col = 0
 
     def check(self, color: Color) -> bool:
