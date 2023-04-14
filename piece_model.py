@@ -301,7 +301,7 @@ class Knight(Piece):
         possible_moves = [(y+2, x+1), (y+2, x-1), (y+1, x+2), (y+1, x-2),
                             (y-2, x+1), (y-2, x-1), (y-1, x+2), (y-1, x-2)]
         for move in possible_moves:
-            if 0 <= move[0] <= 8 and 0 <= move[1] <= 8:
+            if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
                 if self.board[move[0]][move[1]] != self.color:
                     moves.append(move)
 
@@ -336,7 +336,7 @@ class Pawn(Piece):
     def __init__(self, color, board):
         super().__init__(color, board)
         self.color = color
-        self.first_move = True
+        self.first_move = False
         self.board = board
 
         if self.color == Color['WHITE']:
@@ -354,13 +354,14 @@ class Pawn(Piece):
         if self.first_move:
             moves += super().get_vertical_moves(y, x, 1)
 
-        possible_piece_right = self.board[y+1][x+1]
-        if possible_piece_right != self.color and possible_piece_right is not None:
-            moves += possible_piece_right
-
-        possible_piece_left = self.board[y+1][x-1]
-        if possible_piece_left != self.color and possible_piece_left is not None:
-            moves += possible_piece_left
+        if x + 1 >= 8 and y + 1 >= 8:
+            possible_piece_right = self.board[y+1][x+1]
+            if possible_piece_right != self.color and possible_piece_right is not None:
+                moves += possible_piece_right
+        if x - 1 >= 8 and y + 1 >= 8:
+            possible_piece_left = self.board[y+1][x-1]
+            if possible_piece_left != self.color and possible_piece_left is not None:
+                moves += possible_piece_left
 
         return moves
     
