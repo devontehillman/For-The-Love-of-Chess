@@ -47,31 +47,30 @@ class Game():
         Initializes board by starting all pieces in their correct positions
         """
         self._board[0][0] = Rook(Color['BLACK'], self._board)
-        #self._board[0][1] = Knight(Color['BLACK'], self._board)
+        self._board[0][1] = Knight(Color['BLACK'], self._board)
         self._board[0][2] = Bishop(Color['BLACK'], self._board)
         self._board[0][3] = Queen(Color['BLACK'], self._board)
         self._board[0][4] = King(Color['BLACK'], self._board)
         self._board[0][5] = Bishop(Color['BLACK'], self._board)
-        #self._board[0][6] = Knight(Color['BLACK'], self._board)
+        self._board[0][6] = Knight(Color['BLACK'], self._board)
         self._board[0][7] = Rook(Color['BLACK'], self._board)
         
         
-        """for i in range(8):
+        for i in range(8):
             self._board[1][i] = Pawn(Color['BLACK'],  self._board)
-        """
+        
         self._board[7][0] = Rook(Color['WHITE'], self._board)
-        #self._board[7][1] = Knight(Color['WHITE'], self._board)
+        self._board[7][1] = Knight(Color['WHITE'], self._board)
         self._board[7][2] = Bishop(Color['WHITE'], self._board)
         self._board[7][4] = Queen(Color['WHITE'], self._board)
         self._board[7][3] = King(Color['WHITE'], self._board)
         self._board[7][5] = Bishop(Color['WHITE'], self._board)
-        #self._board[7][6] = Knight(Color['WHITE'], self._board)
+        self._board[7][6] = Knight(Color['WHITE'], self._board)
         self._board[7][7] = Rook(Color['WHITE'], self._board)
         
         
-        """for i in range(8):
-            self._board[6][i] = Pawn(Color['WHITE'], self._board)"""
-
+        for i in range(8):
+            self._board[6][i] = Pawn(Color['WHITE'], self._board)
 
 
     def get(self, y:int, x:int):
@@ -125,7 +124,7 @@ class Game():
 
         No player should be allowed to perform a move that places themselves in check.
 
-        If the piece is a Pawn  and the new location is the opposite side of the board, the 
+        #5 If the piece is a Pawn  and the new location is the opposite side of the board, the 
         pawn should be removed and a Queen  of the same color placed in its location.
         """
         #1 
@@ -147,10 +146,19 @@ class Game():
         of the given color.
         """
         locations = []
+        row = 0
+        col = 0
+        maxlength = 16 
+
         for y in self._board:
             for x in y:
-                if self.color == color:
-                    locations.append((y, x))
+                if x != None and x.color == color:
+                    locations.append((row, col))
+                    if len(locations) == maxlength:
+                        return locations
+                col += 1
+            row += 1
+            col = 0 
 
         return locations
 
@@ -158,11 +166,16 @@ class Game():
         """
         This will find the position of the King of the given color.
         """
+        col  = 0 
+        rownum = 0 
         for row in self._board:
             for piece in row:
                 if isinstance(piece, King):
                     if piece._color == color:
-                        return (piece)
+                        return (col,rownum)
+                col += 1 
+            rownum += 1
+            col = 0
 
     def check(self, color: Color) -> bool:
         """
@@ -173,16 +186,24 @@ class Game():
         the list of possible moves, the king is in check. Return True  in this case,
         and False  otherwise.
         """
+        if color == Color['WHITE']:
+            opposing_color = Color['BLACK']
+        else:
+            opposing_color = Color['WHITE']
+
         total_opposing_team_moves = []
-        
-        for piece in self.get_piece_locations(color):
+        print(self.get_piece_locations(opposing_color))
+        for piece in self.get_piece_locations(opposing_color):
             row =  piece[0]
             col =  piece[1]
-            actual_piece = self.board[row][col]
+            #grab pice on board
+            actual_piece = self._board[row][col]
+            #find all of  its valid  moves 
+            total_opposing_team_moves += actual_piece.valid_moves(row,col)
+        #Check if king is in
             
-            total_opposing_team_moves += [actual_piece.valid_moves()]
-        
-        if self.find_king(color) in total_opposing_team_moves:
+
+        if self.find_king(opposing_color) in total_opposing_team_moves:
             return True
         else:
             return False
