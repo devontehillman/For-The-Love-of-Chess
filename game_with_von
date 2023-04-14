@@ -1,5 +1,5 @@
 from piece_model import *
-
+import random
 
 class Stack():
     """
@@ -124,7 +124,16 @@ class Game():
         If the piece is a Pawn  and the new location is the opposite side of the board, the
         pawn should be removed and a Queen  of the same color placed in its location.
         """
-        pass
+        # 1
+        self._B.push(self._board)
+        # 2
+        self._board[y][x] = None
+        self._board[y2][x2] = piece
+        # 3 pawn already takes care of this
+        # 4 Check where king is and then for all opposing pieces check if its location is in their valid moves.
+        # Essentially if you placed your self into check
+        if self.check(piece.color):
+            self.undo()
 
     def get_piece_locations(self, color: Color) -> list[tuple[int, int]]:
         """
@@ -161,10 +170,26 @@ class Game():
         the list of possible moves, the king is in check. Return True  in this case,
         and False  otherwise.
         """
-        locations = self.get_piece_locations(color)
-        possible_moves = []
-        for piece in locations:
+        if color == Color['WHITE']:
+            opposing_color = Color['BLACK']
+        else:
+            opposing_color = Color['WHITE']
 
+        total_opposing_team_moves = []
+        print(self.get_piece_locations(opposing_color))
+        for piece in self.get_piece_locations(opposing_color):
+            row = piece[0]
+            col = piece[1]
+            # grab pice on board
+            actual_piece = self._board[row][col]
+            # find all of  its valid  moves
+            total_opposing_team_moves += actual_piece.valid_moves(row, col)
+        # Check if king is in
+
+        if self.find_king(opposing_color) in total_opposing_team_moves:
+            return True
+        else:
+            return False
 
     def _computer_move(self):
         """
@@ -172,4 +197,15 @@ class Game():
         computer player. In the next phase, you will create a more robust method for picking
         computer moves.
         """
-        pass
+        color = Color['Black']
+        locations = self.get_piece_locations(color)
+        location = random.choice(locations)
+        piece = self.get(location[0], location[1])
+        moves = piece.valid_moves(location[0], location[1])
+        move = random.choice(moves)
+        if self.move(piece, location[0], location[1], move[0], move[1]):
+            return
+
+        else:
+            self.undo()
+            self._computer_move()
