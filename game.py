@@ -131,7 +131,7 @@ class Game():
         self._B.push(self._board)
         #2
         self._board[y][x] = None 
-        self._board[y2][x2] = piece
+        self._board[y2][x2] = piece.copy()
         #3 pawn already takes care of this
         #4 Check where king is and then for all opposing pieces check if its location is in their valid moves. 
         #Essentially if you placed your self into check

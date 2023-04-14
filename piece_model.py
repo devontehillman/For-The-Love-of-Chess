@@ -260,7 +260,7 @@ class Queen(Piece):
 
         return moves
     
-    def copy():
+    def copy(self):
         return copy.deepcopy(self) #is this what I am supposed to do?
     
 class Bishop(Piece):
@@ -329,7 +329,7 @@ class Rook(Piece):
 
         return moves
     
-    def copy():
+    def copy(self):
         return copy.deepcopy(self) #is this what I am supposed to do?
     
 class Pawn(Piece):
