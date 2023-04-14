@@ -83,12 +83,12 @@ class Piece(ABC):
                 continue
             
             #Theres a piece in spot check color
-            #if same exit else add position and exit
+            #if same return moves else add position and return moves
             if self.color == position_to_check.color:
-                exit
+                return moves 
             else:
                 moves.append((row,col))
-                exit
+                return moves
         return moves
 
     def get_diagonal_moves(self, y: int, x: int, distance: int) ->list[tuple[int, int]]:
@@ -126,18 +126,18 @@ class Piece(ABC):
             
             position_to_check = self.board[row][col]
             # No Piece at spot
-            if self.board[row][col] == None:
+            if position_to_check == None:
                 moves.append((row,col))
                 continue
             
             #Theres a piece in spot check color
-            #if same exit else add position and exit
+            #if same return moves else add position and return moves
             if self.color == position_to_check.color:
-                exit
+                return moves
             else:
                 moves.append((row,col))
-                exit
-            return moves
+                return moves
+        return moves
 
     def get_horizontal_moves(self, y: int, x: int, distance: int) ->list[tuple[int, int]]:
         """
@@ -176,17 +176,17 @@ class Piece(ABC):
             position_to_check = self._board[row][col]
             
             # No Piece at spot
-            if self._board[row][col] == None:
+            if position_to_check == None:
                 moves.append((row,col))
                 continue
             
             #Theres a piece in spot check color
-            #if same exit else add position and exit
+            #if same return moves else add position and return moves
             if self.color == position_to_check.color:
-                exit
+                return moves
             else:
                 moves.append((row,col))
-                exit
+                return moves
         return moves
 
     def get_vertical_moves(self, y: int, x: int, distance: int) ->list[tuple[int, int]]:

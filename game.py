@@ -167,12 +167,11 @@ class Game():
         This will find the position of the King of the given color.
         """
         col  = 0 
-        rownum = 0 
+        row_num = 0 
         for row in self._board:
             for piece in row:
-                if isinstance(piece, King):
-                    if piece._color == color:
-                        return (col,rownum)
+                if isinstance(piece, King) and piece._color == color:
+                        return (row_num, col)
                 col += 1 
             rownum += 1
             col = 0
@@ -192,7 +191,6 @@ class Game():
             opposing_color = Color['WHITE']
 
         total_opposing_team_moves = []
-        print(self.get_piece_locations(opposing_color))
         for piece in self.get_piece_locations(opposing_color):
             row =  piece[0]
             col =  piece[1]
@@ -201,9 +199,7 @@ class Game():
             #find all of  its valid  moves 
             total_opposing_team_moves += actual_piece.valid_moves(row,col)
         #Check if king is in
-            
-
-        if self.find_king(opposing_color) in total_opposing_team_moves:
+        if self.find_king(color) in total_opposing_team_moves:
             return True
         else:
             return False
