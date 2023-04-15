@@ -1,6 +1,9 @@
 import copy
 from piece_model import *
 
+def inbounds(x,y):
+        return (0 <= y < 8) and (0 <= x < 8)
+
 class Stack():
         """
         holds prior board states to be utilized by redo/undo
@@ -39,8 +42,15 @@ class Game():
         """
         resets the board and pieces to default state
         """
+        #clear prior moves 
         while not self._B.empty():
             self._B.pop()
+
+        #Create new board
+        self._board = [[None for _ in range(8)] for _ in range(8)]
+        
+        #set up pieces on new board
+        self._setup_pieces()
 
     def _setup_pieces(self):
         """
@@ -72,13 +82,16 @@ class Game():
         for i in range(8):
             self._board[6][i] = Pawn(Color['WHITE'], self._board)
 
-
     def get(self, y:int, x:int):
         """
         Returns the piece at the given position or None if no piece exist
         Responsible for displaying pieces to board
         """
-        return self._board[y][x]
+        #check if the position is on chess board and 
+        if inbounds(x,y) and isinstance(self._board[y][x], Piece):
+            return self._board[y][x]
+        else:
+            return None
 
     def switch_player(self):
         """
@@ -131,7 +144,7 @@ class Game():
         self._B.push(self._board)
         #2
         self._board[y][x] = None 
-        self._board[y2][x2] = piece.copy()
+        self._board[y2][x2] = piece
         #3 pawn already takes care of this
         #4 Check where king is and then for all opposing pieces check if its location is in their valid moves. 
         #Essentially if you placed your self into check
