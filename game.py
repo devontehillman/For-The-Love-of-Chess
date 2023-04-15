@@ -248,7 +248,7 @@ class Game():
         move = random.choice(moves)
         
         if self.move(piece, location[0], location[1], move[0], move[1]):
-            return
+            return color.name + ' moved ' + str(type(piece).__name__) + "<br />"
 
         else:
             self.undo()
