@@ -349,7 +349,6 @@ class Pawn(Piece):
         moves = [(y,x)]
         if self.first_move:
             moves += super().get_vertical_moves(y, x, 2)
-            self.first_move = False
 
         if not self.first_move:
             moves += super().get_vertical_moves(y, x, 1)
