@@ -1,4 +1,5 @@
 import copy
+import random
 from piece_model import *
 
 def inbounds(x,y):
@@ -148,11 +149,24 @@ class Game():
         #3 
         if isinstance(piece, Pawn):
             piece.first_move = False
+
         #4 Check where king is and then for all opposing pieces check if its location is in their valid moves. 
         #Essentially if you placed your self into check
         if self.check(piece.color):
             self.undo()
+            return False
         
+        #5 Is on the opposing side of the board
+        #for white its opposing y2 == 0 and for black its opposing y2 == 7
+        if isinstance(piece, Pawn): 
+            if piece.color == Color["WHITE"] and y2 == 0:
+                self._board[y2][x2] = Queen(Color["WHITE"], self._board)
+                return True
+            elif piece.color == Color["BLACK"] and y2 == 7:
+                self._board[y2][x2] = Queen(Color["BLACK"], self._board)
+                return True
+        
+        return True
 
     
     def get_piece_locations(self, color: Color) -> list[tuple[int, int]]:
@@ -226,7 +240,7 @@ class Game():
         computer player. In the next phase, you will create a more robust method for picking
         computer moves.
         """
-        color = Color['Black']
+        color = Color['BLACK']
         locations = self.get_piece_locations(color)
         location = random.choice(locations)
         piece = self.get(location[0], location[1])
