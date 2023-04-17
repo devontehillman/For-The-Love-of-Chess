@@ -195,11 +195,12 @@ class Piece(ABC):
         all possible directions.
         """
         moves = []
-        # check down
-        if not isinstance(self, Pawn):
+        # check down black pawn can
+        if not isinstance(self, Pawn) or  (self.color ==  Color["BLACK"] and isinstance(self, Pawn)):
             moves += self._vertical_moves(y, x, 1, 0, distance)
-        # check up
-        moves += self._vertical_moves(y, x, -1, 0, distance)
+        # check up white pawn can 
+        if not isinstance(self, Pawn) or  (self.color ==  Color["WHITE"] and isinstance(self, Pawn)):
+            moves += self._vertical_moves(y, x, -1, 0, distance)
         return moves
 
     @abstractmethod
