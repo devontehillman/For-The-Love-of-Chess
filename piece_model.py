@@ -370,4 +370,4 @@ class Pawn(Piece):
         return moves
     
     def copy(self):
-        return copy.deepcopy(self)
+        return Pawn(self.color, self.first_move)

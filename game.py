@@ -22,6 +22,7 @@ class Stack():
             return self.data[-1]
 
         def pop(self):
+            #get the last element
             data = self.peek()
             del self.data[len(self.data) - 1]
             return data
