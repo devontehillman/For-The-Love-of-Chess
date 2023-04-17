@@ -9,6 +9,7 @@ class GUI:
     def __init__(self) -> None:
         pg.init()
         self._game = Game()
+        Piece._game = self._game
         self._screen = pg.display.set_mode((1440, 900))
         pg.display.set_caption("For The Love of Chess")
         self._pieces = pg.image.load("./images/pieces.png")
