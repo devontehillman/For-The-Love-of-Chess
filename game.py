@@ -112,12 +112,14 @@ class Game():
         Pops the last board state from the stack and set the current board to it
         Return true if this can be done and false if there is no prior state
         """
-        if self._B.length() > 1:
+        if self._B.length() >= 2:
             self._B.pop()
             self._board = self._B.peek()
             return True
         else:
-            return False
+            while not self._B.empty():
+                self._B.pop()
+                return False
 
     def copy_board(self):
         """
@@ -170,9 +172,11 @@ class Game():
         # for white its opposing y2 == 0 and for black its opposing y2 == 7
         if isinstance(piece, Pawn):
             if piece.color == Color["WHITE"] and y2 == 0:
+                self._board[y2][x2] = None
                 self._board[y2][x2] = Queen(Color["WHITE"])
                 return True
             elif piece.color == Color["BLACK"] and y2 == 7:
+                self._board[y2][x2] = None
                 self._board[y2][x2] = Queen(Color["BLACK"], self._board)
                 return True
 
@@ -223,6 +227,7 @@ class Game():
         the list of possible moves, the king is in check. Return True  in this case,
         and False  otherwise.
         """
+        """
         if color == Color['WHITE']:
             opposing_color = Color['BLACK']
         else:
@@ -241,6 +246,8 @@ class Game():
             return True
         else:
             return False
+        """
+        pass
 
     def _computer_move(self):
         """
