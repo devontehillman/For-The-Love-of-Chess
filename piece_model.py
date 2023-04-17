@@ -370,20 +370,47 @@ class Pawn(Piece):
 
     def valid_moves(self, y, x):
         moves = []
-        if self.first_move:
-            moves += super().get_vertical_moves(y, x, 2)
+        if self.color == Color['WHITE']:
+            if self.first_move:
+                moves.append((y-2, x))
+                moves.append((y - 1, x))
 
-        if not self.first_move:
-            moves += super().get_vertical_moves(y, x, 1)
+            if not self.first_move:
+                possible_in_front = self._game._board[y-1][x]
+                if possible_in_front is None:
+                    moves.append((y-1, x))
 
-        if x + 1 <= 7 and y + 1 <= 7:
-            possible_piece_right = self._game._board[y + 1][x + 1]
-            if possible_piece_right != self.color and possible_piece_right is not None:
-                moves.append((y - 1, x + 1))
-        if x - 1 <= 7 and y + 1 <= 7:
-            possible_piece_left = self._game._board[y + 1][x - 1]
-            if possible_piece_left != self.color and possible_piece_left is not None:
-                moves.append((y - 1, x - 1))
+            if x + 1 <= 7 and y + 1 <= 7:
+                possible_piece_right = self._game._board[y - 1][x + 1]
+                if possible_piece_right is not None:
+                    if possible_piece_right.color != self.color:
+                        moves.append((y-1, x+1))
+            if x - 1 <= 7 and y + 1 <= 7:
+                possible_piece_left = self._game._board[y - 1][x - 1]
+                if possible_piece_left is not None:
+                    if possible_piece_left.color != self.color:
+                        moves.append((y-1, x-1))
+
+        if self.color == Color['BLACK']:
+            if self.first_move:
+                moves.append((y + 2, x))
+                moves.append((y + 1, x))
+
+            if not self.first_move:
+                possible_in_front = self._game._board[y + 1][x]
+                if possible_in_front is None:
+                    moves.append((y + 1, x))
+
+            if x + 1 <= 7 and y + 1 <= 7:
+                possible_piece_right = self._game._board[y + 1][x + 1]
+                if possible_piece_right is not None:
+                    if possible_piece_right.color != self.color:
+                        moves.append((y + 1, x + 1))
+            if x - 1 <= 7 and y + 1 <= 7:
+                possible_piece_left = self._game._board[y + 1][x - 1]
+                if possible_piece_left is not None:
+                    if possible_piece_left.color != self.color:
+                        moves.append((y + 1, x - 1))
 
         return moves
 
