@@ -195,8 +195,9 @@ class Piece(ABC):
         all possible directions.
         """
         moves = []
-        # check down 
-        moves += self._vertical_moves(y, x, 1, 0, distance)
+        # check down
+        if not isinstance(self, Pawn):
+            moves += self._vertical_moves(y, x, 1, 0, distance)
         # check up
         moves += self._vertical_moves(y, x, -1, 0, distance)
         return moves
@@ -230,7 +231,7 @@ class King(Piece):
             self.set_image(0,1)
     
     def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
-        moves = [(y,x)]
+        moves = []
         moves += super().get_horizontal_moves(y, x, 1)
         moves += super().get_vertical_moves(y, x, 1)
         moves += super().get_diagonal_moves(y, x, 1)
@@ -253,7 +254,7 @@ class Queen(Piece):
             self.set_image(1,1)
     
     def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
-        moves = [(y,x)]
+        moves = []
         moves += super().get_horizontal_moves(y, x, 8)
         moves += super().get_vertical_moves(y, x, 8)
         moves += super().get_diagonal_moves(y, x, 8)
@@ -276,7 +277,7 @@ class Bishop(Piece):
             self.set_image(2,1)
     
     def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
-        moves = [(y,x)]
+        moves = []
         moves += super().get_diagonal_moves(y, x, 8)
 
         return moves
@@ -297,12 +298,16 @@ class Knight(Piece):
             self.set_image(3,1)
 
     def valid_moves(self, y, x):
-        moves = [(y,x)]
+        moves = []
+        #all the possible moves for knight
         possible_moves = [(y+2, x+1), (y+2, x-1), (y+1, x+2), (y+1, x-2),
-                            (y-2, x+1), (y-2, x-1), (y-1, x+2), (y-1, x-2)]
+                          (y-2, x+1), (y-2, x-1), (y-1, x+2), (y-1, x-2)]
+        # check all moves
         for move in possible_moves:
+            #Check if move on board
             if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
-                if self.board[move[0]][move[1]] != self.color:
+                #check if none
+                if self.board[move[0]][move[1]] == None or self.board[move[0]][move[1]].color != self.color:
                     moves.append(move)
 
         return moves
@@ -323,7 +328,7 @@ class Rook(Piece):
             self.set_image(4,1)
     
     def valid_moves(self, y: int, x: int) -> list[tuple[int, int]]:
-        moves = [(y,x)]
+        moves = []
         moves += super().get_horizontal_moves(y, x, 8)
         moves += super().get_vertical_moves(y, x, 8)
 
@@ -346,7 +351,7 @@ class Pawn(Piece):
             self.set_image(5,1)
 
     def valid_moves(self, y, x):
-        moves = [(y,x)]
+        moves = []
         if self.first_move:
             moves += super().get_vertical_moves(y, x, 2)
 
