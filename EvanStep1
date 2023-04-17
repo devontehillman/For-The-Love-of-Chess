@@ -2,9 +2,9 @@ from enum import Enum
 from abc import ABC, abstractmethod
 import pygame
 import copy
-from chess import *
 
 
+# self._game._board
 class Color(Enum):
     WHITE = 0
     BLACK = 1
@@ -14,7 +14,7 @@ class Piece(ABC):
     """
 
     Static Variables
-        _gam(e:list? Stores board? in order for the piece to keep track of the game.
+        _game:list? Stores board? in order for the piece to keep track of the game.
         image:str Holds path to the image file
     """
     _game = None
@@ -128,7 +128,7 @@ class Piece(ABC):
 
             position_to_check = self._game._board[row][col]
             # No Piece at spot
-            if position_to_check is None:
+            if position_to_check == None:
                 moves.append((row, col))
                 continue
 
@@ -178,7 +178,7 @@ class Piece(ABC):
             position_to_check = self._game._board[row][col]
 
             # No Piece at spot
-            if position_to_check is None:
+            if position_to_check == None:
                 moves.append((row, col))
                 continue
 
@@ -244,6 +244,8 @@ class King(Piece):
     def copy(self):
         king = King(self.color)
 
+        return king  # is this what I am supposed to do?
+
 
 class Queen(Piece):
     def __init__(self, color):
@@ -265,7 +267,8 @@ class Queen(Piece):
         return moves
 
     def copy(self):
-        queen = Queen(self.color)
+        queen = Queen(self.color)  # is this what I am supposed to do?
+        return queen
 
 
 class Bishop(Piece):
@@ -287,6 +290,7 @@ class Bishop(Piece):
 
     def copy(self):
         bishop = Bishop(self.color)
+        return bishop  # is this what I am supposed to do?
 
 
 class Knight(Piece):
@@ -310,13 +314,15 @@ class Knight(Piece):
             # Check if move on board
             if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
                 # check if none
-                if self._game._board[move[0]][move[1]] is None or self._game._board[move[0]][move[1]].color != self.color:
+                if self._game._board[move[0]][move[1]] == None or self._game._board[move[0]][
+                    move[1]].color != self.color:
                     moves.append(move)
 
         return moves
 
     def copy(self):
         knight = Knight(self.color)
+        return knight  # is this what I am supposed to do?
 
 
 class Rook(Piece):
@@ -339,6 +345,7 @@ class Rook(Piece):
 
     def copy(self):
         rook = Rook(self.color)
+        return rook
 
 
 class Pawn(Piece):
@@ -357,24 +364,26 @@ class Pawn(Piece):
         moves = []
         if self.color == Color['WHITE']:
             if self.first_move:
-                moves.append((y-2, x))
-                moves.append((y - 1, x))
+                if self._game._board[y-1][x] is None:
+                    moves.append((y - 1, x))
+                    if self._game._board[y-2][x] is None:
+                        moves.append((y - 2, x))
 
             if not self.first_move:
-                possible_in_front = self._game._board[y-1][x]
+                possible_in_front = self._game._board[y - 1][x]
                 if possible_in_front is None:
-                    moves.append((y-1, x))
+                    moves.append((y - 1, x))
 
             if x + 1 <= 7 and y + 1 <= 7:
                 possible_piece_right = self._game._board[y - 1][x + 1]
                 if possible_piece_right is not None:
                     if possible_piece_right.color != self.color:
-                        moves.append((y-1, x+1))
+                        moves.append((y - 1, x + 1))
             if x - 1 <= 7 and y + 1 <= 7:
                 possible_piece_left = self._game._board[y - 1][x - 1]
                 if possible_piece_left is not None:
                     if possible_piece_left.color != self.color:
-                        moves.append((y-1, x-1))
+                        moves.append((y - 1, x - 1))
 
         if self.color == Color['BLACK']:
             if self.first_move:
@@ -392,7 +401,7 @@ class Pawn(Piece):
                     if possible_piece_right.color != self.color:
                         moves.append((y + 1, x + 1))
             if x - 1 <= 7 and y + 1 <= 7:
-                possible_piece_left = self.board[y + 1][x - 1]
+                possible_piece_left = self._game._board[y + 1][x - 1]
                 if possible_piece_left is not None:
                     if possible_piece_left.color != self.color:
                         moves.append((y + 1, x - 1))
@@ -402,3 +411,5 @@ class Pawn(Piece):
     def copy(self):
         pawn = Pawn(self.color)
         pawn.first_move = self.first_move
+        return pawn
+
