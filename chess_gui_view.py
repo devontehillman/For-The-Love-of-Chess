@@ -9,8 +9,9 @@ class GUI:
     def __init__(self) -> None:
         pg.init()
         self._game = Game()
+        Piece._game = self._game
         self._screen = pg.display.set_mode((1440, 900))
-        pg.display.set_caption("Laker Chess")
+        pg.display.set_caption("For The Love of Chess")
         self._pieces = pg.image.load("./images/pieces.png")
         self._ui_manager = gui.UIManager((1440, 900))
         self._side_box = gui.elements.UITextBox('<b>Laker Chess</b><br /><br />White moves first.<br />', relative_rect=pg.Rect((1000, 100), (400, 500)),
@@ -62,9 +63,9 @@ class GUI:
                             self._side_box.append_html_text("WHITE is in CHECK!<br />")
                         if self._game.check(Color.BLACK):
                             self._side_box.append_html_text("BLACK is in CHECK!<br />")
-                        if self._game.mate(Color.WHITE):
+                        if self._game.check(Color.WHITE):
                             self._side_box.append_html_text("WHITE is in CHECKMATE!<br />GAME OVER!")
-                        if self._game.mate(Color.BLACK):
+                        if self._game.check(Color.BLACK):
                             self._side_box.append_html_text("BLACK is in CHECKMATE!<br />GAME OVER!")
 
                         self._piece_selected = False
@@ -73,7 +74,7 @@ class GUI:
                 if event.type == gui.UI_BUTTON_PRESSED:
                     if event.ui_element == self._restart_button:
                         self._game.reset()
-                        self._side_box.set_text("Restarting game...<br />")
+                        self._side_box.set_text("Game Reset<br />")
                     if event.ui_element == self._undo_button:
                         if self._game.undo():
                             self._side_box.append_html_text('Undoing move.<br />')
