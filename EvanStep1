@@ -387,8 +387,10 @@ class Pawn(Piece):
 
         if self.color == Color['BLACK']:
             if self.first_move:
-                moves.append((y + 2, x))
-                moves.append((y + 1, x))
+                if self._game._board[y + 1][x] is None:
+                    moves.append((y + 1, x))
+                    if self._game._board[y + 2][x] is None:
+                        moves.append((y + 2, x))
 
             if not self.first_move:
                 possible_in_front = self._game._board[y + 1][x]
@@ -412,4 +414,3 @@ class Pawn(Piece):
         pawn = Pawn(self.color)
         pawn.first_move = self.first_move
         return pawn
-
