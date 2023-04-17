@@ -83,7 +83,7 @@ class Game():
         for i in range(8):
             self._board[6][i] = Pawn(Color['WHITE'], self._board)
 
-    def get(self, y:int, x:int):
+    def get(self, y:int, x:int)-> Piece:
         """
         Returns the piece at the given position or None if no piece exist
         Responsible for displaying pieces to board
@@ -126,14 +126,14 @@ class Game():
 
     def move(self, piece: Piece, y: int, x: int, y2: int, x2: int) -> bool:
         """
-        1. copy the board into the prior states stack 
-        2. then perform the move by setting the new location(y2,x2) to the piece, 
+        1. Copy the board into the prior states stack 
+        2. Then perform the move by setting the new location(y2,x2) to the piece, 
         and removing the piece from the old location(y,x). 
         
-        #3If the move was made by a Pawn , then the pawn should be
+        #3 If the move was made by a Pawn , then the pawn should be
         updated to reflect that it is no longer the pawn's first move. 
         
-        #4You must then determine if the move resulted in the current player 
+        #4 You must then determine if the move resulted in the current player 
         being placed in check, and undo the move if it does.
 
         No player should be allowed to perform a move that places themselves in check.
@@ -240,13 +240,25 @@ class Game():
         computer player. In the next phase, you will create a more robust method for picking
         computer moves.
         """
+        # black automated movements
         color = Color['BLACK']
+        # Gather all the location of the black pieces
         locations = self.get_piece_locations(color)
-        location = random.choice(locations)
-        piece = self.get(location[0], location[1])
-        moves = piece.valid_moves(location[0], location[1])
-        move = random.choice(moves)
         
+        moves = []
+        while moves == []:
+            # choose a random piece to move
+            location = random.choice(locations)
+            piece = self.get(location[0], location[1])
+            #gather its possible moves
+            moves = piece.valid_moves(location[0], location[1])
+            # gather its possible moves
+            moves = piece.valid_moves(location[0], location[1])
+        #check if piece can move
+        if moves != []:
+        #choose a random move
+            move = random.choice(moves)
+
         if self.move(piece, location[0], location[1], move[0], move[1]):
             return color.name + ' moved ' + str(type(piece).__name__) + "<br />"
 
