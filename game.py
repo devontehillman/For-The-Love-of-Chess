@@ -112,12 +112,12 @@ class Game():
         Pops the last board state from the stack and set the current board to it
         Return true if this can be done and false if there is no prior state
         """
-        if self._B.empty():
-            return False
-        else:
+        if self._B.length() > 1:
             self._B.pop()
             self._board = self._B.peek()
             return True
+        else:
+            return False
 
     def copy_board(self):
         """
