@@ -4,6 +4,7 @@ import pygame
 import copy
 
 
+# self._game._board
 class Color(Enum):
     WHITE = 0
     BLACK = 1
@@ -16,13 +17,12 @@ class Piece(ABC):
         _game:list? Stores board? in order for the piece to keep track of the game.
         image:str Holds path to the image file
     """
-    _game = []
+    _game = None
     SPRITESHEET = pygame.image.load("./images/pieces.png")
 
-    def __init__(self, color: Color, board):
+    def __init__(self, color: Color):
         self._color = color
         self._image = pygame.Surface((105, 105), pygame.SRCALPHA)
-        self._board = board
 
     @property
     def color(self):
@@ -79,10 +79,10 @@ class Piece(ABC):
             if not Piece.inbounds(row, col):
                 return moves
 
-            position_to_check = self.board[row][col]
+            position_to_check = self._game._board[row][col]
 
             # No Piece at spot
-            if self.board[row][col] == None:
+            if self._game._board[row][col] == None:
                 moves.append((row, col))
                 continue
 
@@ -129,7 +129,7 @@ class Piece(ABC):
             if not Piece.inbounds(row, col):
                 return moves
 
-            position_to_check = self.board[row][col]
+            position_to_check = self._game._board[row][col]
             # No Piece at spot
             if position_to_check == None:
                 moves.append((row, col))
@@ -178,7 +178,7 @@ class Piece(ABC):
             if not Piece.inbounds(row, col):
                 return moves
 
-            position_to_check = self._board[row][col]
+            position_to_check = self._game._board[row][col]
 
             # No Piece at spot
             if position_to_check == None:
@@ -228,10 +228,9 @@ class Piece(ABC):
 
 
 class King(Piece):
-    def __init__(self, color, board):
-        super().__init__(color, board)
+    def __init__(self, color):
+        super().__init__(color)
         self.color = color
-        self.board = board
 
         if self.color == Color['WHITE']:
             self.set_image(0, 0)
@@ -248,14 +247,15 @@ class King(Piece):
         return moves
 
     def copy(self):
-        return King(self.color, self.board) # is this what I am supposed to do?
+        king = King(self.color)
+
+        return king  # is this what I am supposed to do?
 
 
 class Queen(Piece):
-    def __init__(self, color, board):
-        super().__init__(color, board)
+    def __init__(self, color):
+        super().__init__(color)
         self.color = color
-        self.board = board
 
         if self.color == Color['WHITE']:
             self.set_image(1, 0)
@@ -272,14 +272,14 @@ class Queen(Piece):
         return moves
 
     def copy(self):
-        return Queen(self.color, self.board)  # is this what I am supposed to do?
+        queen = Queen(self.color)  # is this what I am supposed to do?
+        return queen
 
 
 class Bishop(Piece):
-    def __init__(self, color, board):
-        super().__init__(color, board)
+    def __init__(self, color):
+        super().__init__(color)
         self.color = color
-        self.board = board
 
         if self.color == Color['WHITE']:
             self.set_image(2, 0)
@@ -294,14 +294,14 @@ class Bishop(Piece):
         return moves
 
     def copy(self):
-        return Bishop(self.color, self.board)  # is this what I am supposed to do?
+        bishop = Bishop(self.color)
+        return bishop  # is this what I am supposed to do?
 
 
 class Knight(Piece):
-    def __init__(self, color, board):
-        super().__init__(color, board)
+    def __init__(self, color):
+        super().__init__(color)
         self.color = color
-        self.board = board
 
         if self.color == Color['WHITE']:
             self.set_image(3, 0)
@@ -321,21 +321,22 @@ class Knight(Piece):
             # Check if move on board
             if 0 <= move[0] <= 7 and 0 <= move[1] <= 7:
                 # check if none
-                if self.board[move[0]][move[1]] == None or self.board[move[0]][
-                    move[1]].color != self.color:
+                if self._game._board[move[0]][move[1]] is None or \
+                        self._game._board[move[0]][
+                            move[1]].color != self.color:
                     moves.append(move)
 
         return moves
 
     def copy(self):
-        return Knight(self.color, self.board)  # is this what I am supposed to do?
+        knight = Knight(self.color)
+        return knight  # is this what I am supposed to do?
 
 
 class Rook(Piece):
-    def __init__(self, color, board):
-        super().__init__(color, board)
+    def __init__(self, color):
+        super().__init__(color)
         self.color = color
-        self.board = board
 
         if self.color == Color['WHITE']:
             self.set_image(4, 0)
@@ -351,15 +352,15 @@ class Rook(Piece):
         return moves
 
     def copy(self):
-        return Rook(self.color, self.board) # is this what I am supposed to do?
+        rook = Rook(self.color)
+        return rook
 
 
 class Pawn(Piece):
-    def __init__(self, color, board):
-        super().__init__(color, board)
+    def __init__(self, color):
+        super().__init__(color)
         self.color = color
         self.first_move = True
-        self.board = board
 
         if self.color == Color['WHITE']:
             self.set_image(5, 0)
@@ -375,16 +376,18 @@ class Pawn(Piece):
         if not self.first_move:
             moves += super().get_vertical_moves(y, x, 1)
 
-        if x + 1 >= 8 and y + 1 >= 8:
-            possible_piece_right = self.board[y + 1][x + 1]
+        if x + 1 <= 7 and y + 1 <= 7:
+            possible_piece_right = self._game._board[y + 1][x + 1]
             if possible_piece_right != self.color and possible_piece_right is not None:
-                moves += possible_piece_right
-        if x - 1 >= 8 and y + 1 >= 8:
-            possible_piece_left = self.board[y + 1][x - 1]
+                moves.append((y - 1, x + 1))
+        if x - 1 <= 7 and y + 1 <= 7:
+            possible_piece_left = self._game._board[y + 1][x - 1]
             if possible_piece_left != self.color and possible_piece_left is not None:
-                moves += possible_piece_left
+                moves.append((y - 1, x - 1))
 
         return moves
 
     def copy(self):
-        return Pawn(self.color, self.board)
+        pawn = Pawn(self.color)
+        pawn.first_move = self.first_move
+        return pawn
