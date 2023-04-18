@@ -196,7 +196,7 @@ class Game():
 
         for y in self._board:
             for x in y:
-                if x != None and x.color == color:
+                if x is not None and x.color == color:
                     locations.append((row, col))
                     if len(locations) == maxlength:
                         return locations
@@ -276,14 +276,16 @@ class Game():
         # Gather all the location of the black pieces
         locations = self.get_piece_locations(color)
         moves = []
-        while moves == []:
+        while not moves:
             # choose a random piece to move
+            white = Color['WHITE']
+            white_pieces = self.get_piece_locations(white)
             location = random.choice(locations)
             piece = self.get(location[0], location[1])
             # gather its possible moves
             moves = piece.valid_moves(location[0], location[1])
         # check if piece can move
-        if moves != []:
+        if moves:
             # choose a random move
             move = random.choice(moves)
 
@@ -299,25 +301,29 @@ class Game():
         if not self.check(color):
             return False
 
-        if color == Color['BLACK']:
-            opposing_color = Color["WHITE"]
         else:
-            opposing_color = Color['BLACK']
-        king_pos = self.find_king(color)
-        king_moves = King.valid_moves(king_pos[0], king_pos[1])
-        opposing_piece = self.get_piece_locations(opposing_color)
-        for piece in opposing_piece:
-            opposing_moves = []
-            opposing_moves += piece.valid_moves(piece[0], piece[1])
+            if color == Color['BLACK']:
+                opposing_color = Color["WHITE"]
+            else:
+                opposing_color = Color['BLACK']
+            king_pos = self.find_king(color)
+            king_moves = King.valid_moves(king_pos[0], king_pos[1])
+            opposing_piece = self.get_piece_locations(opposing_color)
+            for piece in opposing_piece:
+                opposing_moves = []
+                opposing_moves += piece.valid_moves(piece[0], piece[1])
 
-        for move in king_moves:
-            if move not in opposing_moves:
-                return False
-
-        friendly_moves = self.get_piece_locations(color)
-        for piece in friendly_moves:
-            for move in friendly_moves.valid_moves(piece[0], piece[1]):
-                if not self.check(color):
+            for move in king_moves:
+                if move not in opposing_moves:
                     return False
                 else:
-                    return True
+                    friendly_moves = self.get_piece_locations(color)
+                    for homie in friendly_moves:
+                        opp_blocka = self._board[homie[0]][homie[1]]
+                        blocker_moves = opp_blocka.valid_moves(homie[0], homie[1])
+                        for move in blocker_moves:
+                            self.move(opp_blocka, homie[0], homie[1], move[0], move[1])
+                            if not self.check(color):
+                                return False
+
+            return True
