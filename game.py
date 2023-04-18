@@ -44,6 +44,7 @@ class Game():
         self.current_player = Color.WHITE
         self._setup_pieces()
         self._B = Stack()
+        self.copy_board()
 
     def reset(self):
         """
@@ -112,10 +113,18 @@ class Game():
         Pops the last board state from the stack and set the current board to it
         Return true if this can be done and false if there is no prior state
         """
-        if self._B.length() >= 2:
+        if self._B.length() > 2 and (self._B.length() % 2) == 0 :
             self._B.pop()
             self._board = self._B.peek()
             return True
+        if self._B.length() > 2 and (self._B.length() % 2) == 1 :
+            self._B.pop()
+            self._B.pop()
+            self._board = self._B.peek()
+            return True
+        elif self._B.length() == 2:
+            self._B.pop()
+            self._board = self._B.peek()
         else:
             while not self._B.empty():
                 self._B.pop()
@@ -137,6 +146,7 @@ class Game():
                 else:
                     self._prior[i][j] = None
         self._B.push(self._prior)
+        print(self._B.length())
 
     def move(self, piece: Piece, y: int, x: int, y2: int, x2: int) -> bool:
         """
@@ -164,9 +174,11 @@ class Game():
 
         # 4 Check where king is and then for all opposing pieces check if its location is in their valid moves.
         # Essentially if you placed your self into check
-        if self.check(piece.color):
+
+        if self.check(piece.color == Color["WHITE"]):
             self.undo()
             return False
+
 
         # 5 Is on the opposing side of the board
         # for white its opposing y2 == 0 and for black its opposing y2 == 7
@@ -227,7 +239,6 @@ class Game():
         the list of possible moves, the king is in check. Return True  in this case,
         and False  otherwise.
         """
-        """
         if color == Color['WHITE']:
             opposing_color = Color['BLACK']
         else:
@@ -241,13 +252,13 @@ class Game():
             actual_piece = self._board[row][col]
             # find all of  its valid  moves
             total_opposing_team_moves += actual_piece.valid_moves(row, col)
+
         # Check if king is in
         if self.find_king(color) in total_opposing_team_moves:
+            print("CHECK!")
             return True
         else:
             return False
-        """
-        pass
 
     def _computer_move(self):
         """
@@ -275,10 +286,20 @@ class Game():
             move = random.choice(moves)
 
         if self.move(piece, location[0], location[1], move[0], move[1]):
-            self.copy_board()
             return color.name + ' moved ' + str(
                 type(piece).__name__) + "<br />"
 
         else:
             self.undo()
             self._computer_move()
+
+    def mate(self, color):
+        if color == Color['WHITE']:
+            opposing_color = Color['BLACK']
+        else:
+            opposing_color = Color['WHITE']
+
+
+
+
+
