@@ -148,6 +148,11 @@ class Game():
         self._B.push(self._prior)
         print(self._B.length())
 
+    def self_check_reset(self):
+        self._board = self._B.peek()
+        self._B.pop()
+        self.copy_board()
+
     def move(self, piece: Piece, y: int, x: int, y2: int, x2: int) -> bool:
         """
         1. Copy the board into the prior states stack
@@ -175,8 +180,10 @@ class Game():
         # 4 Check where king is and then for all opposing pieces check if its location is in their valid moves.
         # Essentially if you placed your self into check
 
-        if self.check(piece.color == Color["WHITE"]):
-            self.undo()
+        opposing_color = Color['BLACK']
+        white = Color['WHITE']
+        if self.check(white):
+            self.self_check_reset()
             return False
 
 
@@ -294,10 +301,35 @@ class Game():
             self._computer_move()
 
     def mate(self, color):
+        """
         if color == Color['WHITE']:
             opposing_color = Color['BLACK']
         else:
             opposing_color = Color['WHITE']
+
+        if not self.check(opposing_color):
+            return False
+
+        king_pos = self.find_king(color)
+        king_moves = King.valid_moves(king_pos[0], king_pos[1])
+        opposing_piece = self.get_piece_locations(opposing_color)
+        for piece in opposing_piece:
+            opposing_moves = []
+            opposing_moves += piece.valid_moves(piece[0], piece[1])
+
+        for move in king_moves:
+            if move not in opposing_moves:
+                return False
+
+        friendly_moves = self.get_piece_locations(color)
+        for piece in friendly_moves:
+            for move in friendly_moves.valid_moves(piece[0], piece[1]):
+                if not self.check(color):
+                    return False
+                else:
+                    return True
+        """
+        pass
 
 
 
