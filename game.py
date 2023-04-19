@@ -277,7 +277,30 @@ class Game():
         color = Color['BLACK']
         # Gather all the location of the black pieces
         locations = self.get_piece_locations(color)
+        if self.check(color):
+            if not self.mate(color):
+                king_pos = self.find_king(color)
+                king = self.get(king_pos[0], king_pos[1])
+                print(king_pos)
+                king_moves = king.valid_moves(king_pos[0], king_pos[1])
+                opposing_piece = self.get_piece_locations(Color['WHITE'])
+                print(king_moves)
+                opposing_moves = []
+                friendly_moves = []
+                for opp_piece_location in opposing_piece:
+                    enemy = self.get(opp_piece_location[0],
+                                     opp_piece_location[1])
+                    opposing_moves += enemy.valid_moves(opp_piece_location[0],
+                                                        opp_piece_location[1])
 
+                for move in king_moves:
+                    if move not in opposing_moves:
+                        if self.move(king, king_pos[0], king_pos[1], move[0],
+                                     move[1]):
+                            return color.name + ' moved ' + str(
+                                type(king).__name__) + "<br />"
+
+        #
         moves = []
         while moves == []:
             # choose a random piece to move
@@ -301,35 +324,46 @@ class Game():
             self._computer_move()
 
     def mate(self, color):
-        """
-        if color == Color['WHITE']:
-            opposing_color = Color['BLACK']
-        else:
-            opposing_color = Color['WHITE']
-
-        if not self.check(opposing_color):
+        if not self.check(color):
             return False
 
-        king_pos = self.find_king(color)
-        king_moves = King.valid_moves(king_pos[0], king_pos[1])
-        opposing_piece = self.get_piece_locations(opposing_color)
-        for piece in opposing_piece:
+        else:
+            if color == Color['BLACK']:
+                opposing_color = Color["WHITE"]
+            else:
+                opposing_color = Color['BLACK']
+            king_pos = self.find_king(color)
+            king = self.get(king_pos[0], king_pos[1])
+            print(king_pos)
+            king_moves = king.valid_moves(king_pos[0], king_pos[1])
+            opposing_piece = self.get_piece_locations(opposing_color)
+            print(king_moves)
             opposing_moves = []
-            opposing_moves += piece.valid_moves(piece[0], piece[1])
+            friendly_moves = []
+            for opp_piece_location in opposing_piece:
+                enemy = self.get(opp_piece_location[0], opp_piece_location[1])
+                opposing_moves += enemy.valid_moves(opp_piece_location[0],
+                                                    opp_piece_location[1])
 
-        for move in king_moves:
-            if move not in opposing_moves:
-                return False
-
-        friendly_moves = self.get_piece_locations(color)
-        for piece in friendly_moves:
-            for move in friendly_moves.valid_moves(piece[0], piece[1]):
-                if not self.check(color):
+            for move in king_moves:
+                if move not in opposing_moves:
                     return False
                 else:
-                    return True
-        """
-        pass
+                    friendly_peices = self.get_piece_locations(color)
+                    for friend in friendly_peices:
+                        friendly_peice = self.get(friend[0], friend[1])
+                        friendly_moves += friendly_peice.valid_moves(friend[0], friend[1])
+
+
+
+                        for move in friendly_moves:
+                            self.move(friendly_peice, friend[0], friend[1], move[0], move[1])
+                            if self.check(opposing_color):
+                                self.self_check_reset()
+                                return True
+                            else:
+                                self.self_check_reset()
+                return False
 
 
 
