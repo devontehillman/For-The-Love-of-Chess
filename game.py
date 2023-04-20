@@ -45,6 +45,15 @@ class Game():
         self._setup_pieces()
         self._B = Stack()
         self.copy_board()
+        self.first = True
+
+    @property
+    def current_player(self):
+        return self._current_player
+    
+    @current_player.setter
+    def current_player(self, value):
+        self._current_player = value
 
     def reset(self):
         """
@@ -54,16 +63,28 @@ class Game():
         while not self._B.empty():
             self._B.pop()
 
+        self.current_player = Color.WHITE
+
         # Create new board
         self._board = [[None for _ in range(8)] for _ in range(8)]
 
         # set up pieces on new board
         self._setup_pieces()
+        self.first = True
+        
 
     def _setup_pieces(self):
         """
         Initializes board by starting all pieces in their correct positions
         """
+        """self._board[0][0] = King(Color['BLACK'])
+        self._board[0][2] = Pawn(Color['BLACK'])
+        self._board[2][2] = King(Color['WHITE'])
+        self._board[3][1] = Queen(Color['WHITE'])
+
+        self._board[2][4] = Pawn(Color['WHITE'])
+        self._board[2][6] = Pawn(Color['WHITE'])"""
+
         self._board[0][0] = Rook(Color['BLACK'])
         self._board[0][1] = Knight(Color['BLACK'])
         self._board[0][2] = Bishop(Color['BLACK'])
@@ -87,7 +108,8 @@ class Game():
 
         for i in range(8):
             self._board[6][i] = Pawn(Color['WHITE'])
-
+        
+        
     def get(self, y: int, x: int) -> Piece:
         """
         Returns the piece at the given position or None if no piece exist
@@ -103,50 +125,72 @@ class Game():
         """
         Switches current player to opposing player
         """
-        if self.Color == Color['WHITE']:
-            self.Color = Color['BLACK']
+        if self.current_player == Color['WHITE']:
+            self.current_player = self.Color = Color['BLACK']
         else:
-            self.Color = Color['WHITE']
+            self.current_player = self.Color = Color['WHITE']
 
     def undo(self):
         """
         Pops the last board state from the stack and set the current board to it
         Return true if this can be done and false if there is no prior state
         """
-        if self._B.length() > 2 and (self._B.length() % 2) == 0 :
+        color = self.current_player
+
+        #Try to undo before any moves
+        if self._B.length() == None:
+            return False
+        #white hits undo twice after first move
+        elif self._B.length() == 1:
+            self._board = self._B.data[0]
+            self._board = self.copy_board()
+            return False
+        #White is undoing
+        elif self._B.length() >2 and color == Color['WHITE']:
+            self._B.pop()
             self._B.pop()
             self._board = self._B.peek()
+            self._board = self.copy_board()
             return True
-        if self._B.length() > 2 and (self._B.length() % 2) == 1 :
-            self._B.pop()
+        #Black is undoing
+        elif self._B.length() > 2 and color == Color['BLACK']:
             self._B.pop()
             self._board = self._B.peek()
+            self._board = self.copy_board()
             return True
-        elif self._B.length() == 2:
+        
+        elif self._B.length() == 2 and color == Color['BLACK']:
             self._B.pop()
             self._board = self._B.peek()
-        else:
+            self._board = self.copy_board()
+            return True
+            
+            
+        
+        #No Moves
+        """else:
             while not self._B.empty():
                 self._B.pop()
-                return False
+                self._setup_pieces(self)
+                return False"""
 
+        
     def copy_board(self):
         """
         allowing the human to undo a move, having a copy of the board allows
         the AI to explore possible moves without affecting the current board.
         Copying a board must be a deep copy - not a shallow copy.
         """
-        self._prior = []
-        self._prior = [[None for _ in range(8)] for _ in range(8)]
+        prior = []
+        prior = [[None for _ in range(8)] for _ in range(8)]
         for i in range(8):
             for j in range(8):
                 piece = self._board[i][j]
                 if piece is not None:
-                    self._prior[i][j] = piece.copy()
+                    prior[i][j] = piece.copy()
                 else:
-                    self._prior[i][j] = None
-        self._B.push(self._prior)
-        print(self._B.length())
+                    prior[i][j] = None
+        return prior
 
     def self_check_reset(self):
         self._board = self._B.peek()
@@ -166,37 +210,45 @@ class Game():
         #5 If the piece is a Pawn  and the new location is the opposite side of the board, the
         pawn should be removed and a Queen  of the same color placed in its location.
         """
-        # 1
-        self.copy_board()
-        # 2
-        self._board[y][x] = None
-        self._board[y2][x2] = piece
-        # 3
+        
+        if self.first:
+            self._B.push(self.copy_board())
+            self.first = False
+        #pawn check
         if isinstance(piece, Pawn):
             piece.first_move = False
+            if piece.color == Color["WHITE"] and y2 == 0:
+                self._board[y][x] = None
+                self._board[y2][x2] = Queen(Color["WHITE"])
+            elif piece.color == Color["BLACK"] and y2 == 7:
+                self._board[y][x] = None
+                self._board[y2][x2] = Queen(Color["BLACK"])
+            #regular pawn move
+            else:
+                self._board[y][x] = None
+                self._board[y2][x2] = piece
+        #Other pieces
+        else:
+            self._board[y][x] = None
+            self._board[y2][x2] = piece
+        
+        #Push board to stack
+        self._B.push(self.copy_board())
+        self.switch_player()
+
 
         # 4 Check where king is and then for all opposing pieces check if its location is in their valid moves.
         # Essentially if you placed your self into check
 
-        opposing_color = Color['BLACK']
-        white = Color['WHITE']
-        if self.check(white):
-            self.self_check_reset()
+        if piece.color == Color['WHITE'] and self.check(piece.color):
+            self.undo() 
+            self.switch_player()
             return False
 
 
         # 5 Is on the opposing side of the board
         # for white its opposing y2 == 0 and for black its opposing y2 == 7
-        if isinstance(piece, Pawn):
-            if piece.color == Color["WHITE"] and y2 == 0:
-                self._board[y2][x2] = None
-                self._board[y2][x2] = Queen(Color["WHITE"])
-                return True
-            elif piece.color == Color["BLACK"] and y2 == 7:
-                self._board[y2][x2] = None
-                self._board[y2][x2] = Queen(Color["BLACK"], self._board)
-                return True
-
+        
         return True
 
     def get_piece_locations(self, color: Color):
@@ -259,6 +311,7 @@ class Game():
             total_opposing_team_moves += actual_piece.valid_moves(row, col)
 
         # Check if king is in
+        king_pos = self.find_king(color)
         if self.find_king(color) in total_opposing_team_moves:
             print("CHECK!")
             return True
@@ -275,28 +328,29 @@ class Game():
         color = Color['BLACK']
         # Gather all the location of the black pieces
         locations = self.get_piece_locations(color)
-
-        moves = []
-        while moves == []:
-            # choose a random piece to move
-            location = random.choice(locations)
-            piece = self.get(location[0], location[1])
-            # gather its possible moves
-            moves = piece.valid_moves(location[0], location[1])
-            # gather its possible moves
-            moves = piece.valid_moves(location[0], location[1])
-        # check if piece can move
-        if moves != []:
-            # choose a random move
-            move = random.choice(moves)
-
-        if self.move(piece, location[0], location[1], move[0], move[1]):
-            return color.name + ' moved ' + str(
-                type(piece).__name__) + "<br />"
-
+        
+        #do I have to move the king? if so the move is based on this
+        if self.check(color):
+            self.mate(color)
+        #else pick a random piece and only if it can move move it
         else:
-            self.undo()
-            self._computer_move()
+            moves = []
+            while moves == []:
+                # choose a random piece to move
+                location = random.choice(locations)
+                piece = self.get(location[0], location[1])
+                # gather its possible moves
+                moves = piece.valid_moves(location[0], location[1])
+                # gather its possible moves
+                moves = piece.valid_moves(location[0], location[1])
+            # check if piece can move
+            if moves != []:
+                # choose a random move
+                move = random.choice(moves)
+                self.move(piece, location[0], location[1], move[0], move[1])
+                return color.name + ' moved ' + str(type(piece).__name__) + "<br />"
+
+
     def mate(self, color: Color)-> bool:
         """
         Checkmate results when the king is in check and no moves left on the board will allow the 
@@ -338,38 +392,65 @@ class Game():
         king = self.get(king_pos[0],king_pos[1])
         king_moves = king.valid_moves(king_pos[0], king_pos[1])
         #2.1 gather all opposing teams piece possible moves
-        opposing_pieces = self.get_piece_locations(opposing_color)
+        opposing_piece = self.get_piece_locations(opposing_color)
         
         opposing_moves = []
-        for piece_loc in opposing_pieces:
+        opposing_moves_by_piece = {}
+        for piece_loc in opposing_piece:
             piece = self.get(piece_loc[0], piece_loc[1])
             opposing_moves += piece.valid_moves(piece_loc[0], piece_loc[1])
+            #location = str(piece_loc[0]) + "," + str(piece_loc[1])
+            opposing_moves_by_piece[(piece_loc[0], piece_loc[1])] = piece.valid_moves(piece_loc[0], piece_loc[1])
 
-        #2.2 Check if king can evade opposing team
+        #2.2 Check if king can evade opposing team(save its self)
         moves_that_threaten_king = []
+        king_moved = False
         for move in king_moves:
-            if move not in opposing_moves:
-                return False
-            else:
-                moves_that_threaten_king.append(move)
+            self.move(king, king_pos[0], king_pos[1], move[0], move[1])
 
-        #3 Check to see if your other pieces can move to block opponent
+            if self.check(king.color) and king.color == Color["BLACK"]:
+                #switch player back because their going to attempt to move again
+                self.switch_player()
+                self.undo()
+                moves_that_threaten_king.append(move)
+            elif not self.check(king.color) and king.color == Color["BLACK"]:
+                return False
+            
+            # Check if white can evade if can allow human to move
+            elif self.check(king.color) and king.color == Color["WHITE"]:
+                self.switch_player()
+                self.undo()
+
+            elif not self.check(king.color) and king.color == Color["WHITE"]:
+                self.undo()
+                self.switch_player()
+                return False
+        
+            
+    
+
+        #3 Check to see if kings other pieces can move to block opponent
         # Gather all of your pieces(the homies) and move them to see if you can get your king out of check 
         the_homies_loc = self.get_piece_locations(color)
+        the_homies_loc.remove(king_pos)
         #loop to access all of your your team pieces with the gathered location        
         for homie_location in the_homies_loc:
             homie_moves = []
             homie = self.get(homie_location[0], homie_location[1])
-            homie_moves += homie.valid_moves(piece[0], piece[1])
+            homie_moves += homie.valid_moves(homie_location[0], homie_location[1])
             #loop to check if any of the moves will get the king out of check
             for move in homie_moves:
                 self.move(homie, homie_location[0], homie_location[1], move[0], move[1])
                 #if the resulting move gets the king out of check then you can avoid check mate
-                if self.check(color) == False:
+                if self.check(color) == False and king.color == Color["BLACK"]:
+                    return False
+                elif self.current_player == Color["BLACK"]:
                     self.undo()
                     return False
                 #The move doesn't save king, but still undo move so board stays the same.
+                self.switch_player()
                 self.undo()
         #If you get through all homies and can't be saved you are in check mate
+        self.current_player = None
         return True
             

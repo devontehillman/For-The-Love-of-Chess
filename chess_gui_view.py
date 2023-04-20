@@ -14,7 +14,7 @@ class GUI:
         pg.display.set_caption("For The Love of Chess")
         self._pieces = pg.image.load("./images/pieces.png")
         self._ui_manager = gui.UIManager((1440, 900))
-        self._side_box = gui.elements.UITextBox('<b>Laker Chess</b><br /><br />White moves first.<br />', relative_rect=pg.Rect((1000, 100), (400, 500)),
+        self._side_box = gui.elements.UITextBox('<b>For The Love of Chess</b><br /><br />White moves first.<br />', relative_rect=pg.Rect((1000, 100), (400, 500)),
                                 manager=self._ui_manager)
         self._undo_button = gui.elements.UIButton(relative_rect = pg.Rect((1000, 50), (100, 50)), text='Undo',
                                     manager=self._ui_manager)
